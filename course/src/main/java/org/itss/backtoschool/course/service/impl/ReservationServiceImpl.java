@@ -31,13 +31,13 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public CreateReservationResponse createReservation(CreateReservationRequest request) {
-        var user =  loadUser(request.getUserId());
+    public CreateReservationResponse createReservations(CreateReservationRequest request) {
+        var user = loadUser(request.getUserId());
         var createdReservations = new ArrayList<Reservation>();
 
-        request.getSeatIds().forEach(seatId -> {
-            processReservation(seatId, user, request.getReservationDate(), createdReservations);
-        });
+        request.getSeatIds().forEach(seatId ->
+                processReservation(seatId, user, request.getReservationDate(), createdReservations)
+        );
 
         var reservationDTOs = createdReservations.stream()
                 .map(reservationMapper::toDTO)
@@ -49,10 +49,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private User loadUser(Long userId) {
-        return userRepository.findById(userId).orElse(null);
+        return userRepository.findById(userId).orElseThrow(RuntimeException::new);
     }
 
     private void processReservation(Long seatId, User user, LocalDate reservationDate, List<Reservation> createdReservations) {
+
         var seat = seatRepository.findById(seatId).orElseThrow(RuntimeException::new);
         validateSeatAvailability(seat, reservationDate);
 
@@ -67,8 +68,12 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private void validateSeatAvailability(Seat seat, LocalDate reservationDate) {
-        if (reservationRepository.existsBySeatIdAndReservationDateAndStatus(seat.getId(), reservationDate, ReservationStatus.ACTIVE)) {
+        if (isSeatAlreadyReserved(seat.getId(), reservationDate)) {
             throw new RuntimeException();
         }
+    }
+
+    private boolean isSeatAlreadyReserved(Long seatId, LocalDate reservationDate) {
+        return reservationRepository.existsBySeatIdAndReservationDateAndStatus(seatId, reservationDate, ReservationStatus.ACTIVE);
     }
 }

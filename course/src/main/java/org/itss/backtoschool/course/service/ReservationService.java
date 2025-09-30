@@ -6,6 +6,5 @@ import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 
 
 public interface ReservationService {
-    CreateReservationResponse createReservation(CreateReservationRequest response);
-
+    CreateReservationResponse createReservations(CreateReservationRequest request);
 }

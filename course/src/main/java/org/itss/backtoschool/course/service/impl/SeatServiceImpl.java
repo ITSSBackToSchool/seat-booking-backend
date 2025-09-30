@@ -1,0 +1,24 @@
+package org.itss.backtoschool.course.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.itss.backtoschool.course.dto.SeatDTO;
+import org.itss.backtoschool.course.mapper.SeatMapper;
+import org.itss.backtoschool.course.repository.SeatRepository;
+import org.itss.backtoschool.course.service.SeatService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class SeatServiceImpl implements SeatService {
+
+    private final SeatRepository seatRepository;
+    private final SeatMapper seatMapper;
+
+    @Override
+    public List<SeatDTO> getAllSeats() {
+        var seats = seatRepository.findAll();
+        return seatMapper.toDTOList(seats);
+    }
+}

@@ -15,4 +15,7 @@ public class CreateReservationRequest {
     private List<Long> seatIds;
     private LocalDate reservationDate;
 
+
+
+
 }

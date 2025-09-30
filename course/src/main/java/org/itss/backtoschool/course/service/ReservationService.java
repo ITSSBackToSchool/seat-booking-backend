@@ -1,7 +1,11 @@
 package org.itss.backtoschool.course.service;
 
-import org.springframework.stereotype.Service;
+import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
+import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 
-@Service
+
+
 public interface ReservationService {
+    CreateReservationResponse createReservation(CreateReservationRequest response);
+
 }

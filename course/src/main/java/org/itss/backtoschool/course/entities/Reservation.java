@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Builder
 public class Reservation extends CommonEntity{
 
     @Column(nullable = false)

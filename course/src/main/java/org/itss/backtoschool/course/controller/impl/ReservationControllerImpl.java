@@ -30,4 +30,9 @@ public class ReservationControllerImpl implements ReservationController {
     public List<ReservationDTO> findAll(){
         return reservationService.findAll();
     }
+
+    @Override
+    public List<ReservationDTO> findReservationsByUserId(Long userId) {
+        return reservationService.findReservationsByUserId(userId);
+    }
 }

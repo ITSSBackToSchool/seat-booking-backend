@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>course</module>
+        <module>deskops</module>
     </modules>
 
     <properties>

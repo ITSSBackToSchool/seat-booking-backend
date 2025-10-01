@@ -10,4 +10,5 @@ public interface ReservationController {
 
     @PostMapping
     ResponseEntity<CreateReservationResponse> createReservations(@RequestBody CreateReservationRequest request);
+
 }

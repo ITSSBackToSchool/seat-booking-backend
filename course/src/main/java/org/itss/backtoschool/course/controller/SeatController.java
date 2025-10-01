@@ -10,4 +10,5 @@ public interface SeatController {
 
     @GetMapping
     ResponseEntity<List<SeatDTO>> getAllSeats();
+
 }

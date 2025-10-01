@@ -5,13 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateReservationRequest {
+public class CreateReservationRoomRequest {
     private Long userId;
-    private List<Long> seatIds;
+    private List<Long> roomIds;
     private LocalDate reservationDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

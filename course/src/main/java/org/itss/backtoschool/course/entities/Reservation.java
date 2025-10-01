@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @Entity
@@ -12,22 +13,33 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Builder
-public class Reservation extends CommonEntity{
+public class Reservation extends CommonEntity {
 
     @Column(nullable = false)
     private LocalDate reservationDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "start_time")
+    private LocalTime startTime;
+
+    @Column(nullable = false, name = "end_time")
+    private LocalTime endTime;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ReservationStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_id",  nullable = false)
+    @JoinColumn(name = "seat_id", nullable = false)
     @ToString.Exclude
     private Seat seat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",  nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude
-    private User user;
+    private User users;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    @ToString.Exclude
+    private Room room;
 }

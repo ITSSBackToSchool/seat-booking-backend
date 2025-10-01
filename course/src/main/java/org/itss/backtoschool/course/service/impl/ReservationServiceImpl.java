@@ -1,6 +1,7 @@
 package org.itss.backtoschool.course.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.itss.backtoschool.course.dto.ReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 import org.itss.backtoschool.course.entities.Reservation;
@@ -46,6 +47,18 @@ public class ReservationServiceImpl implements ReservationService {
         return CreateReservationResponse.builder()
                 .reservations(reservationDTOs)
                 .build();
+    }
+
+    @Override
+    public List<ReservationDTO> findAll(){
+        return reservationRepository.findAll().stream().map(reservationMapper::toDTO).toList();
+    }
+
+    @Override
+    public List<ReservationDTO> findReservationsByUserId(Long userId) {
+        return reservationRepository
+                .findReservationsByUserId(userId).stream()
+                .map(reservationMapper::toDTO).toList();
     }
 
     private User loadUser(Long userId) {

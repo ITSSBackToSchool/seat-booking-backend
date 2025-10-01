@@ -2,11 +2,13 @@ package org.itss.backtoschool.course.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.SeatDTO;
+import org.itss.backtoschool.course.entities.ReservationStatus;
 import org.itss.backtoschool.course.mapper.SeatMapper;
 import org.itss.backtoschool.course.repository.SeatRepository;
 import org.itss.backtoschool.course.service.SeatService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,5 +22,10 @@ public class SeatServiceImpl implements SeatService {
     public List<SeatDTO> getAllSeats() {
         var seats = seatRepository.findAll();
         return seatMapper.toDTOList(seats);
+    }
+
+    @Override
+    public List<SeatDTO> getAvailableSeats(LocalDate date,ReservationStatus status) {
+        return seatRepository.findAvailableSeats(date,status).stream().map(seatMapper::toDTO).toList();
     }
 }

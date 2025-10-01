@@ -20,4 +20,3 @@ public class WeatherController {
         return weatherService.getWeather(city);
     }
 }
-//

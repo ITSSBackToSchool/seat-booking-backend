@@ -10,7 +10,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>course</module>
-        <module>my-work</module>
     </modules>
 
     <properties>

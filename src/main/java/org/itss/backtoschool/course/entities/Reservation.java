@@ -1,6 +1,5 @@
 package org.itss.backtoschool.course.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +18,10 @@ public class Reservation extends CommonEntity {
     @Column(nullable = false)
     private LocalDate reservationDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "start_time")
     private LocalTime startTime;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
 
     @Enumerated(EnumType.STRING)
@@ -43,8 +42,4 @@ public class Reservation extends CommonEntity {
     @JoinColumn(name = "room_id", nullable = false)
     @ToString.Exclude
     private Room room;
-
-
-
-
 }

@@ -1,10 +1,7 @@
 package org.itss.backtoschool.course.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
-
-
 
 import java.util.List;
 

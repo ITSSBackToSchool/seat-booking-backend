@@ -17,16 +17,16 @@ public class User extends CommonEntity {
     @Column(nullable = false)
     private String userName;
 
-    @Column(nullable = false)
-    private String password;
-
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
 
     @Column
     private String phone;
 
-    @Column
+    @Column(name = "home_adress")
     private String homeAdress;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -114,38 +114,36 @@
 -- INSERT INTO seat (seat_number, room_id) VALUES ('Seat 5', 7);
 --
 -- -- Insert Sample Users
--- INSERT INTO users (name, email) VALUES ('Bogdan David', 'bogdan.david@email.com');
--- INSERT INTO users (name, email) VALUES ('Test Test', 'test.test@email.com');
+-- INSERT INTO user (name, email) VALUES ('Bogdan David', 'bogdan.david@email.com');
+-- INSERT INTO user (name, email) VALUES ('Test Test', 'test.test@email.com');
 
+INSERT INTO building (id, name)
+VALUES (1, 'Cladirea A');
 
-INSERT INTO building (id, name) VALUES (1, 'Building A');
-INSERT INTO building (id, name) VALUES (2, 'Building B');
+INSERT INTO floor (id, name, building_id)
+VALUES (1, 'Etaj 1', 1),
+       (2, 'Etaj 2', 1);
 
+INSERT INTO room (id, name, seat_count, room_type, floor_id)
+VALUES (1, 'Room 101', 10, 'DESK_ROOM', 1),
+       (2, 'Conference A', 25, 'CONFERENCE_ROOM', 1);
 
-INSERT INTO floor (id, name, building_id) VALUES (1, 'First Floor', 1);
-INSERT INTO floor (id, name, building_id) VALUES (2, 'Second Floor', 1);
-INSERT INTO floor (id, name, building_id) VALUES (3, 'Ground Floor', 2);
+INSERT INTO seat (id, seat_number, room_id)
+VALUES (1, 'S1', 1),
+       (2, 'S2', 1),
+       (3, 'S3', 1),
+       (4, 'C1', 2),
+       (5, 'C2', 2);
 
-
-INSERT INTO room (id, name, floor_id, seat_count) VALUES (1, 'Room 101', 1, 20);
-INSERT INTO room (id, name, floor_id, seat_count) VALUES (2, 'Room 102', 1, 25);
-INSERT INTO room (id, name, floor_id, seat_count) VALUES (3, 'Conference Room A', 2, 50);
-
-INSERT INTO seat (id, seat_number, room_id) VALUES (1, 'A1', 1);
-INSERT INTO seat (id, seat_number, room_id) VALUES (2, 'A2', 1);
-INSERT INTO seat (id, seat_number, room_id) VALUES (3, 'B1', 2);
-INSERT INTO seat (id, seat_number, room_id) VALUES (4, 'C1', 3);
 
 INSERT INTO users (id, user_name, password, email, phone, home_adress)
-VALUES (1, 'Bogdan David', 'secret123', 'bogdan.david@email.com', '0712345678', 'Bucuresti');
-
-INSERT INTO users (id, user_name, password, email)
-VALUES (2, 'Mihaela Pop', 'pass123', 'ana.pop@email.com');
+VALUES (1, 'Bogdan David', 'secret123', 'bogdan.david@email.com', '0712345678', 'Bucuresti'),
+       (2, 'Maria Popescu', 'pass456', 'maria.popescu@email.com', '0722334455', 'Cluj');
 
 
-INSERT INTO reservations (id, reservation_date, start_time, end_time, status, seat_id, user_id, room_id)
-VALUES (1, '2025-10-02', '10:00:00', '11:00:00', 'ACTIVE', 1, 1, 1);
+INSERT INTO reservations (id, reservation_date, start_time, end_time, status, seat_id, room_id, user_id)
+VALUES (1, '2025-10-05', '09:00:00', '10:00:00', 'ACTIVE', 1, 1, 1),
+       (2, '2025-10-05', '10:00:00', '11:00:00', 'ACTIVE', 2, 1, 2),
+       (3, '2025-10-06', '09:00:00', '11:00:00', 'CANCELLED', 4, 2, 1);
 
-INSERT INTO reservations (reservation_date, start_time, end_time, status, room_id, seat_id, user_id)
-VALUES ('2025-10-01', '09:00:00', '11:00:00', 'ACTIVE', 1, 1, 1);
 

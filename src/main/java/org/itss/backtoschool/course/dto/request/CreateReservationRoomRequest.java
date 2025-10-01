@@ -15,5 +15,6 @@ public class CreateReservationRoomRequest {
     private Long userId;
     private List<Long> roomIds;
     private LocalDate reservationDate;
-    private LocalTime reservationTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

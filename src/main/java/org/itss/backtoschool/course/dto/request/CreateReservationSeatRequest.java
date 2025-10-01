@@ -15,5 +15,7 @@ public class CreateReservationSeatRequest {
     private Long userId;
     private List<Long> seatIds;
     private LocalDate reservationDate;
-    private LocalTime reservationTime;
+   private LocalTime startTime;
+   private LocalTime endTime;
+
 }

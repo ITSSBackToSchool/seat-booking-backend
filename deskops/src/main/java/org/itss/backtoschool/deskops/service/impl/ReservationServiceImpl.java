@@ -1,6 +1,8 @@
 package org.itss.backtoschool.deskops.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.itss.backtoschool.deskops.dto.WeatherDTO;
 import org.itss.backtoschool.deskops.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.deskops.dto.response.CreateReservationResponse;
 import org.itss.backtoschool.deskops.entities.Reservation;
@@ -15,6 +17,7 @@ import org.itss.backtoschool.deskops.repository.ReservationRepository;
 import org.itss.backtoschool.deskops.repository.SeatRepository;
 import org.itss.backtoschool.deskops.repository.UserRepository;
 import org.itss.backtoschool.deskops.service.ReservationService;
+import org.itss.backtoschool.deskops.service.WeatherService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
@@ -30,6 +34,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final SeatRepository seatRepository;
     private final UserRepository userRepository;
     private final ReservationMapper reservationMapper;
+    private final WeatherService weatherService;
 
 
     @Override
@@ -43,12 +48,26 @@ public class ReservationServiceImpl implements ReservationService {
         );
 
         var reservationDTOs = createdReservations.stream()
-                .map(reservationMapper::toDTO)
+                .map(reservation -> {
+                    var dto = reservationMapper.toDTO(reservation);
+                    enrichWithWeather(dto, reservation);
+                    return dto;
+                })
                 .toList();
 
         return CreateReservationResponse.builder()
                 .reservations(reservationDTOs)
                 .build();
+    }
+
+    private void enrichWithWeather(org.itss.backtoschool.deskops.dto.ReservationDTO dto, Reservation reservation) {
+        try {
+            Long buildingId = reservation.getSeat().getRoom().getFloor().getBuilding().getId();
+            WeatherDTO weather = weatherService.getWeatherForDate(buildingId, reservation.getReservationDate());
+            dto.setWeather(weather);
+        } catch (Exception e) {
+            log.warn("Failed to fetch weather for reservation {}: {}", reservation.getId(), e.getMessage());
+        }
     }
 
     private User loadUser(Long userId) {

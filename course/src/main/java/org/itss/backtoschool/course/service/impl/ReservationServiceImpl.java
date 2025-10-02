@@ -7,6 +7,9 @@ import org.itss.backtoschool.course.entities.Reservation;
 import org.itss.backtoschool.course.entities.ReservationStatus;
 import org.itss.backtoschool.course.entities.Seat;
 import org.itss.backtoschool.course.entities.User;
+import org.itss.backtoschool.course.exception.seat.SeatAlreadyReservedException;
+import org.itss.backtoschool.course.exception.seat.SeatNotFoundException;
+import org.itss.backtoschool.course.exception.user.UserNotFoundException;
 import org.itss.backtoschool.course.mapper.ReservationMapper;
 import org.itss.backtoschool.course.repository.ReservationRepository;
 import org.itss.backtoschool.course.repository.SeatRepository;
@@ -49,12 +52,12 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private User loadUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(RuntimeException::new);
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
     private void processReservation(Long seatId, User user, LocalDate reservationDate, List<Reservation> createdReservations) {
 
-        var seat = seatRepository.findById(seatId).orElseThrow(RuntimeException::new);
+        var seat = seatRepository.findById(seatId).orElseThrow(SeatNotFoundException::new);
         validateSeatAvailability(seat, reservationDate);
 
         var reservation = reservationRepository.save(Reservation.builder()
@@ -69,7 +72,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     private void validateSeatAvailability(Seat seat, LocalDate reservationDate) {
         if (isSeatAlreadyReserved(seat.getId(), reservationDate)) {
-            throw new RuntimeException();
+            throw new SeatAlreadyReservedException();
         }
     }
 

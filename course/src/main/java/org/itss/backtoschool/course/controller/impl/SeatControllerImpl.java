@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -25,8 +26,8 @@ public class SeatControllerImpl implements SeatController {
     }
 
     @Override
-    public List<SeatDTO> getAvailableSeats(LocalDate date) {
-        return seatService.getAvailableSeats(date, ReservationStatus.ACTIVE);
+    public List<SeatDTO> getAvailableSeats(LocalDateTime dateStart, LocalDateTime dateEnd) {
+        return seatService.getAvailableSeats(dateStart, dateEnd, ReservationStatus.ACTIVE);
     }
 
 }

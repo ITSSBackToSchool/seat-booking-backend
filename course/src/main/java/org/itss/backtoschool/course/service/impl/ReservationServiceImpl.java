@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
         var createdReservations = new ArrayList<Reservation>();
 
         request.getSeatIds().forEach(seatId ->
-                processReservation(seatId, user, request.getReservationDate(), createdReservations)
+                processReservation(seatId, user, request.getReservationDateStart(), request.getReservationDateEnd(), createdReservations)
         );
 
         var reservationDTOs = createdReservations.stream()
@@ -79,7 +80,7 @@ public class ReservationServiceImpl implements ReservationService {
         List<Reservation> reservations = reservationRepository.findAll();
 
         reservations.stream()
-                .filter(reservation -> reservation.getReservationDate().isBefore(LocalDate.now()) && reservation.getStatus()==ReservationStatus.ACTIVE)
+                .filter(reservation -> reservation.getReservationDateEnd().isBefore(LocalDateTime.now()) && reservation.getStatus()==ReservationStatus.ACTIVE)
                 .forEach(reservation -> reservation.setStatus(ReservationStatus.COMPLETED));
 
         reservationRepository.saveAll(reservations);
@@ -91,13 +92,14 @@ public class ReservationServiceImpl implements ReservationService {
         return userRepository.findById(userId).orElseThrow(RuntimeException::new);
     }
 
-    private void processReservation(Long seatId, User user, LocalDate reservationDate, List<Reservation> createdReservations) {
+    private void processReservation(Long seatId, User user, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd, List<Reservation> createdReservations) {
 
         var seat = seatRepository.findById(seatId).orElseThrow(RuntimeException::new);
-        validateSeatAvailability(seat, reservationDate);
+        validateSeatAvailability(seat, reservationDateStart, reservationDateEnd);
 
         var reservation = reservationRepository.save(Reservation.builder()
-                .reservationDate(reservationDate)
+                .reservationDateStart(reservationDateStart)
+                .reservationDateEnd(reservationDateEnd)
                 .status(ReservationStatus.ACTIVE)
                 .seat(seat)
                 .user(user)
@@ -106,13 +108,13 @@ public class ReservationServiceImpl implements ReservationService {
         createdReservations.add(reservation);
     }
 
-    private void validateSeatAvailability(Seat seat, LocalDate reservationDate) {
-        if (isSeatAlreadyReserved(seat.getId(), reservationDate)) {
+    private void validateSeatAvailability(Seat seat, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd) {
+        if (isSeatAlreadyReserved(seat.getId(), reservationDateStart, reservationDateEnd)) {
             throw new RuntimeException();
         }
     }
 
-    private boolean isSeatAlreadyReserved(Long seatId, LocalDate reservationDate) {
-        return reservationRepository.existsBySeatIdAndReservationDateAndStatus(seatId, reservationDate, ReservationStatus.ACTIVE);
+    private boolean isSeatAlreadyReserved(Long seatId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd) {
+        return reservationRepository.existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(seatId, reservationDateStart, reservationDateStart, ReservationStatus.ACTIVE);
     }
 }

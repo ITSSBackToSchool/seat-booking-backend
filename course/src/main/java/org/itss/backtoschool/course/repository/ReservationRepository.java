@@ -9,10 +9,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    boolean existsBySeatIdAndReservationDateAndStatus(Long seatId, LocalDate reservationDate, ReservationStatus reservationStatus);
+    boolean existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(Long seatId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd, ReservationStatus reservationStatus);
     List<Reservation> findReservationsByUserId(Long userId);
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -15,7 +16,10 @@ import java.time.LocalDate;
 public class Reservation extends CommonEntity{
 
     @Column(nullable = false)
-    private LocalDate reservationDate;
+    private LocalDateTime reservationDateStart;
+
+    @Column(nullable = false)
+    private LocalDateTime reservationDateEnd;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

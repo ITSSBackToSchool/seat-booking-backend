@@ -8,7 +8,7 @@ import org.itss.backtoschool.course.repository.SeatRepository;
 import org.itss.backtoschool.course.service.SeatService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,7 +25,7 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public List<SeatDTO> getAvailableSeats(LocalDate date,ReservationStatus status) {
-        return seatRepository.findAvailableSeats(date,status).stream().map(seatMapper::toDTO).toList();
+    public List<SeatDTO> getAvailableSeats(LocalDateTime dateStart, LocalDateTime dateEnd, ReservationStatus status) {
+        return seatRepository.findAvailableSeats(dateStart, dateEnd, status).stream().map(seatMapper::toDTO).toList();
     }
 }

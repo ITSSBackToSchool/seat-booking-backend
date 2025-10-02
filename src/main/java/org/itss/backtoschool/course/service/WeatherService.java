@@ -1,18 +1,37 @@
 package org.itss.backtoschool.course.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
 
 @Service
 public class WeatherService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String apiKey = "38b299938d8652bc02580415c1c5f8f9";
+    private static final String API_KEY = "";
 
-    public Map<String, Object> getWeather(String city) {
-        String url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
-        return restTemplate.getForObject(url, Map.class);
+    public String getWeatherForDate(String city, String date) throws Exception {
+        String url = String.format(
+                "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%s/%s?unitGroup=metric&key=%s&contentType=json",
+                city, date, API_KEY
+        );
+
+        RestTemplate restTemplate = new RestTemplate();
+        String responseBody = restTemplate.getForObject(url, String.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(responseBody);
+
+
+        JsonNode day = root.path("days").get(0);
+
+        String conditions = day.path("conditions").asText();
+        double tempMax = day.path("tempmax").asDouble();
+        double tempMin = day.path("tempmin").asDouble();
+
+        return String.format(
+                "Prognoza pentru %s (%s): %.1f°C max, %.1f°C min, %s",
+                city, date, tempMax, tempMin, conditions
+        );
     }
 }

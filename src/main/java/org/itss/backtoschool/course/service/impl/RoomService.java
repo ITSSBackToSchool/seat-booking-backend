@@ -1,4 +1,4 @@
-package org.itss.backtoschool.course.service;
+package org.itss.backtoschool.course.service.impl;
 
 import org.itss.backtoschool.course.dto.RoomDTO;
 

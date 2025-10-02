@@ -3,7 +3,6 @@ package org.itss.backtoschool.deskops.dto.response;
 import lombok.Data;
 
 @Data
-public class TrafficFlowResponse {
-    private FlowSegmentData flowSegmentData;
+public class GeocodeResult {
+    private Position position;
 }
-

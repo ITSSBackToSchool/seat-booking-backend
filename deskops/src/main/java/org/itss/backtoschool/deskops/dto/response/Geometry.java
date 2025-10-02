@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GeocodeAPIResponse {
-    private List<GeocodeResult> results;
+public class Geometry {
+    private String type;
+    private List<List<Double>> coordinates;
 }
-

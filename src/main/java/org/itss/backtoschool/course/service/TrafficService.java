@@ -18,7 +18,7 @@ public class TrafficService {
                 "https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&departure_time=now&traffic_model=best_guess&key=%s",
                 origin, destination, API_KEY
         );
-
+//
         RestTemplate restTemplate = new RestTemplate();
         String responseBody = restTemplate.getForObject(url, String.class);
 

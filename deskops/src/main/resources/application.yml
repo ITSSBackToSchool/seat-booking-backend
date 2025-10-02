@@ -22,3 +22,16 @@ spring:
 
 server:
   port: 8080
+
+weather:
+  provider: openweathermap
+  api-key: ${WEATHER_API_KEY:demo_key}
+  base-url: https://api.openweathermap.org/data/2.5
+  timeout-seconds: 5
+  cache:
+    current-ttl-minutes: 120
+    forecast-ttl-minutes: 360
+  default-location:
+    city: Bucharest
+    latitude: 44.4268
+    longitude: 26.1025

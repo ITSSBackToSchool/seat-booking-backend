@@ -1,6 +1,7 @@
 package org.itss.backtoschool.deskops.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.itss.backtoschool.deskops.exception.reservation.ReservationNotFoundException;
 import org.itss.backtoschool.deskops.exception.seat.SeatAlreadyReservedException;
 import org.itss.backtoschool.deskops.exception.seat.SeatNotFoundException;
 import org.itss.backtoschool.deskops.exception.user.UserNotFoundException;
@@ -53,6 +54,19 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReservationNotFoundException(ReservationNotFoundException ex, WebRequest request) {
+        log.error("Reservation not found: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

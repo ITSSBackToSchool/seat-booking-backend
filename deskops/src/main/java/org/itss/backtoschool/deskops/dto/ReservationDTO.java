@@ -21,4 +21,5 @@ public class ReservationDTO {
     private Long userId;
     private String userName;
     private String userEmail;
+    private WeatherDTO weather;
 }

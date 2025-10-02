@@ -35,4 +35,9 @@ public class ReservationControllerImpl implements ReservationController {
     public List<ReservationDTO> findReservationsByUserId(Long userId) {
         return reservationService.findReservationsByUserId(userId);
     }
+
+    @Override
+    public String cancelReservation(Long reservationId) {
+        return reservationService.cancelResevation(reservationId);
+    }
 }

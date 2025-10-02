@@ -5,10 +5,7 @@ import org.itss.backtoschool.course.dto.ReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,4 +19,7 @@ public interface ReservationController {
 
     @GetMapping("/user/{userId}")
     List<ReservationDTO> findReservationsByUserId(@PathVariable Long userId);
+
+    @PutMapping("/{reservationId}")
+    String cancelReservation(@PathVariable Long reservationId);
 }

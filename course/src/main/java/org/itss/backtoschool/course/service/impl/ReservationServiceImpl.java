@@ -13,6 +13,7 @@ import org.itss.backtoschool.course.repository.ReservationRepository;
 import org.itss.backtoschool.course.repository.SeatRepository;
 import org.itss.backtoschool.course.repository.UserRepository;
 import org.itss.backtoschool.course.service.ReservationService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +61,31 @@ public class ReservationServiceImpl implements ReservationService {
                 .findReservationsByUserId(userId).stream()
                 .map(reservationMapper::toDTO).toList();
     }
+
+    @Override
+    public String cancelResevation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
+        if(reservation.getStatus()!=ReservationStatus.CANCELLED) {
+            reservation.setStatus(ReservationStatus.CANCELLED);
+            reservationRepository.save(reservation);
+        }
+
+        return "Rezervare anulata cu succes";
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 0 * * *")
+    public String completeReservations() {
+        List<Reservation> reservations = reservationRepository.findAll();
+
+        reservations.stream()
+                .filter(reservation -> reservation.getReservationDate().isBefore(LocalDate.now()) && reservation.getStatus()==ReservationStatus.ACTIVE)
+                .forEach(reservation -> reservation.setStatus(ReservationStatus.COMPLETED));
+
+        reservationRepository.saveAll(reservations);
+        return "Rezervarile completate cu succes";
+    }
+
 
     private User loadUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(RuntimeException::new);

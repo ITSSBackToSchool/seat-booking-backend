@@ -12,4 +12,6 @@ public interface ReservationService {
     CreateReservationResponse createReservations(CreateReservationRequest request);
     List<ReservationDTO> findAll();
     List<ReservationDTO> findReservationsByUserId(Long userId);
+    String cancelResevation(Long reservationId);
+    String completeReservations();
 }

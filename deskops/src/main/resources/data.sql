@@ -116,3 +116,10 @@ INSERT INTO seat (seat_number, room_id) VALUES ('Seat 5', 7);
 -- Insert Sample Users
 INSERT INTO user (name, email) VALUES ('Bogdan David', 'bogdan.david@email.com');
 INSERT INTO user (name, email) VALUES ('Test Test', 'test.test@email.com');
+
+-- Insert Locations for Buildings
+INSERT INTO location (building_id, city, district, latitude, longitude, address)
+VALUES (1, 'Bucharest', 'District 1', 44.4368, 26.1025, 'T1 Building, Strada Știrbei Vodă 107, București');
+
+INSERT INTO location (building_id, city, district, latitude, longitude, address)
+VALUES (2, 'Bucharest', 'District 2', 44.4268, 26.0925, 'T2 Building, Bucharest');

@@ -1,0 +1,169 @@
+package org.itss.backtoschool.deskops.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.itss.backtoschool.deskops.client.WeatherClient;
+import org.itss.backtoschool.deskops.config.WeatherApiConfig;
+import org.itss.backtoschool.deskops.dto.WeatherDTO;
+import org.itss.backtoschool.deskops.dto.external.weather.OpenWeatherMapResponse;
+import org.itss.backtoschool.deskops.entities.Location;
+import org.itss.backtoschool.deskops.entities.WeatherData;
+import org.itss.backtoschool.deskops.exception.weather.LocationNotConfiguredException;
+import org.itss.backtoschool.deskops.exception.weather.WeatherDataNotFoundException;
+import org.itss.backtoschool.deskops.mapper.WeatherMapper;
+import org.itss.backtoschool.deskops.repository.LocationRepository;
+import org.itss.backtoschool.deskops.repository.WeatherDataRepository;
+import org.itss.backtoschool.deskops.service.WeatherService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class WeatherServiceImpl implements WeatherService {
+
+    private final LocationRepository locationRepository;
+    private final WeatherDataRepository weatherDataRepository;
+    private final WeatherClient weatherClient;
+    private final WeatherMapper weatherMapper;
+    private final WeatherApiConfig weatherApiConfig;
+
+    @Override
+    @Transactional(readOnly = true)
+    public WeatherDTO getWeatherForDate(Long buildingId, LocalDate date) {
+        Location location = getLocationByBuildingId(buildingId);
+
+        // Try to get from cache
+        var cachedWeather = weatherDataRepository.findByLocationIdAndDate(location.getId(), date);
+
+        if (cachedWeather.isPresent() && isCacheValid(cachedWeather.get())) {
+            log.info("Returning cached weather for building {} on date {}", buildingId, date);
+            return weatherMapper.toDTO(cachedWeather.get());
+        }
+
+        // Fetch from external API and cache
+        return fetchAndCacheWeatherForDate(location, date);
+    }
+
+    @Override
+    @Transactional
+    public List<WeatherDTO> getWeatherForecast(Long buildingId, Integer days) {
+        Location location = getLocationByBuildingId(buildingId);
+        int forecastDays = (days != null && days > 0) ? days : 5;
+
+        // Fetch forecast from API
+        OpenWeatherMapResponse response = weatherClient.fetchForecast(
+                location.getLatitude(),
+                location.getLongitude(),
+                forecastDays
+        );
+
+        // Process and cache the forecast data
+        List<WeatherDTO> forecast = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (int i = 0; i < forecastDays; i++) {
+            LocalDate targetDate = today.plusDays(i);
+            WeatherData weatherData = findOrCreateWeatherDataForDate(response, location, targetDate);
+
+            if (weatherData != null) {
+                forecast.add(weatherMapper.toDTO(weatherData));
+            }
+        }
+
+        return forecast;
+    }
+
+    private Location getLocationByBuildingId(Long buildingId) {
+        return locationRepository.findByBuildingId(buildingId)
+                .orElseThrow(() -> new LocationNotConfiguredException(
+                        "Location not configured for building ID: " + buildingId));
+    }
+
+    @Transactional
+    protected WeatherDTO fetchAndCacheWeatherForDate(Location location, LocalDate date) {
+        log.info("Fetching weather from external API for location {} on date {}", location.getCity(), date);
+
+        OpenWeatherMapResponse response = weatherClient.fetchForecast(
+                location.getLatitude(),
+                location.getLongitude(),
+                5
+        );
+
+        WeatherData weatherData = findOrCreateWeatherDataForDate(response, location, date);
+
+        if (weatherData == null) {
+            throw new WeatherDataNotFoundException("No weather data available for date: " + date);
+        }
+
+        return weatherMapper.toDTO(weatherData);
+    }
+
+    @Transactional
+    protected WeatherData findOrCreateWeatherDataForDate(OpenWeatherMapResponse response, Location location, LocalDate targetDate) {
+        // Check if already cached
+        var existing = weatherDataRepository.findByLocationIdAndDate(location.getId(), targetDate);
+        if (existing.isPresent() && isCacheValid(existing.get())) {
+            return existing.get();
+        }
+
+        // Find the forecast item closest to noon on the target date
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime targetDateTime = targetDate.atTime(12, 0);
+
+        OpenWeatherMapResponse.ForecastItem closestItem = response.getForecastList().stream()
+                .filter(item -> {
+                    LocalDate itemDate = Instant.ofEpochSecond(item.getTimestamp())
+                            .atZone(zoneId)
+                            .toLocalDate();
+                    return itemDate.equals(targetDate);
+                })
+                .findFirst()
+                .orElse(null);
+
+        if (closestItem == null || closestItem.getWeather().isEmpty()) {
+            log.warn("No weather data found for date: {}", targetDate);
+            return null;
+        }
+
+        // Create and save weather data
+        WeatherData weatherData = WeatherData.builder()
+                .location(location)
+                .date(targetDate)
+                .temperature(closestItem.getMain().getTemperature())
+                .feelsLike(closestItem.getMain().getFeelsLike())
+                .condition(closestItem.getWeather().getFirst().getCondition())
+                .description(closestItem.getWeather().getFirst().getDescription())
+                .humidity(closestItem.getMain().getHumidity())
+                .windSpeed(closestItem.getWind().getSpeed())
+                .iconCode(closestItem.getWeather().getFirst().getIcon())
+                .fetchedAt(LocalDateTime.now())
+                .build();
+
+        // Delete old cache if exists
+        existing.ifPresent(weatherDataRepository::delete);
+
+        return weatherDataRepository.save(weatherData);
+    }
+
+    private boolean isCacheValid(WeatherData weatherData) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = LocalDate.now();
+
+        // Historical data is always valid
+        if (weatherData.getDate().isBefore(today)) {
+            return true;
+        }
+
+        // For today and future dates, check TTL
+        int ttlMinutes = weatherData.getDate().equals(today)
+                ? weatherApiConfig.getCache().getCurrentTtlMinutes()
+                : weatherApiConfig.getCache().getForecastTtlMinutes();
+
+        return weatherData.getFetchedAt().plusMinutes(ttlMinutes).isAfter(now);
+    }
+}

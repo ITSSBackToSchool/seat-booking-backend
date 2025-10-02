@@ -9,6 +9,7 @@ import org.itss.backtoschool.deskops.entities.Reservation;
 import org.itss.backtoschool.deskops.entities.ReservationStatus;
 import org.itss.backtoschool.deskops.entities.Seat;
 import org.itss.backtoschool.deskops.entities.User;
+import org.itss.backtoschool.deskops.exception.reservation.ReservationNotFoundException;
 import org.itss.backtoschool.deskops.exception.seat.SeatAlreadyReservedException;
 import org.itss.backtoschool.deskops.exception.seat.SeatNotFoundException;
 import org.itss.backtoschool.deskops.exception.user.UserNotFoundException;
@@ -97,5 +98,82 @@ public class ReservationServiceImpl implements ReservationService {
 
     private boolean isSeatAlreadyReserved(Long seatId, LocalDate reservationDate) {
         return reservationRepository.existsBySeatIdAndReservationDateAndStatus(seatId, reservationDate, ReservationStatus.ACTIVE);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CreateReservationResponse getAllReservations() {
+        var reservations = reservationRepository.findAll();
+
+        var reservationDTOs = reservations.stream()
+                .map(reservation -> {
+                    var dto = reservationMapper.toDTO(reservation);
+                    enrichWithWeather(dto, reservation);
+                    return dto;
+                })
+                .toList();
+
+        return CreateReservationResponse.builder()
+                .reservations(reservationDTOs)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CreateReservationResponse getReservation(Long reservationId) {
+        var reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
+
+        var dto = reservationMapper.toDTO(reservation);
+        enrichWithWeather(dto, reservation);
+
+        return CreateReservationResponse.builder()
+                .reservations(List.of(dto))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void deleteReservation(Long reservationId) {
+        var reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(reservation);
+        log.info("Cancelled reservation with ID: {}", reservationId);
+    }
+
+    @Override
+    @Transactional
+    public CreateReservationResponse updateReservation(Long reservationId, org.itss.backtoschool.deskops.dto.request.UpdateReservationRequest request) {
+        var reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
+
+        // Check if updating seat or date
+        boolean seatChanged = request.getSeatId() != null && !request.getSeatId().equals(reservation.getSeat().getId());
+        boolean dateChanged = request.getReservationDate() != null && !request.getReservationDate().equals(reservation.getReservationDate());
+
+        if (seatChanged) {
+            var newSeat = seatRepository.findById(request.getSeatId())
+                    .orElseThrow(SeatNotFoundException::new);
+            LocalDate targetDate = request.getReservationDate() != null ? request.getReservationDate() : reservation.getReservationDate();
+            validateSeatAvailability(newSeat, targetDate);
+            reservation.setSeat(newSeat);
+        }
+
+        if (dateChanged) {
+            validateSeatAvailability(reservation.getSeat(), request.getReservationDate());
+            reservation.setReservationDate(request.getReservationDate());
+        }
+
+        reservationRepository.save(reservation);
+        log.info("Updated reservation with ID: {}", reservationId);
+
+        var dto = reservationMapper.toDTO(reservation);
+        enrichWithWeather(dto, reservation);
+
+        return CreateReservationResponse.builder()
+                .reservations(List.of(dto))
+                .build();
     }
 }

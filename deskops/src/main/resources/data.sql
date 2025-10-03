@@ -113,9 +113,10 @@ INSERT INTO seat (seat_number, room_id) VALUES ('Seat 3', 7);
 INSERT INTO seat (seat_number, room_id) VALUES ('Seat 4', 7);
 INSERT INTO seat (seat_number, room_id) VALUES ('Seat 5', 7);
 
--- Insert Sample Users
-INSERT INTO user (name, email) VALUES ('Bogdan David', 'bogdan.david@email.com');
-INSERT INTO user (name, email) VALUES ('Test Test', 'test.test@email.com');
+-- Insert Sample Users (auth0UserId will be set when they first log in via Auth0)
+-- These are placeholder users for testing - in production, users will be auto-created on first login
+-- INSERT INTO user (name, email, auth0_user_id) VALUES ('Bogdan David', 'bogdan.david@email.com', 'auth0|placeholder1');
+-- INSERT INTO user (name, email, auth0_user_id) VALUES ('Test Test', 'test.test@email.com', 'auth0|placeholder2');
 
 -- Insert Locations for Buildings
 INSERT INTO location (building_id, city, district, latitude, longitude, address)

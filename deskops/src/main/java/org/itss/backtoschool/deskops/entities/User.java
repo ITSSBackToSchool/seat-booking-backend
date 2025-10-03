@@ -13,6 +13,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class User extends CommonEntity{
 
+    @Column(unique = true, nullable = false)
+    private String auth0UserId;
+
     @Column(nullable = false)
     private String name;
 

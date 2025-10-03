@@ -11,10 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TrafficServiceImpl implements TrafficService {
 	private final RestTemplate restTemplate = new RestTemplate();
 
-//	private final String directionsUrl = "https://atlas.microsoft.com/route/directions/json";
-//	private final String incidentsUrl = "https://atlas.microsoft.com/traffic/incident";
-//
-//	private final String subscriptionKey = "DVMi3mwcpXW8LIFxEI8Q0OVPNi7PVtWUdTA94ybNUV9e5f3jtKDgJQQJ99BJAC5RqLJ9OuKzAAAgAZMPDWQ0";
+
 
 	@Override
 	public TrafficRouteOption getDirections(String start, boolean traffic, String travelMode) {

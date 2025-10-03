@@ -22,14 +22,3 @@ spring:
 
 server:
   port: 8080
-  azure:
-    maps:
-      subscription-key: ${AZURE_MAPS_KEY:DVMi3mwcpXW8LIFxEI8Q0OVPNi7PVtWUdTA94ybNUV9e5f3jtKDgJQQJ99BJAC5RqLJ9OuKzAAAgAZMPDWQ0}
-      base-url: https://atlas.microsoft.com
-      api-version: 2024-04-01
-
-    company:
-      headquarters:
-        latitude: 44.4268
-        longitude: 26.1025
-        address: "Bucharest, Romania"

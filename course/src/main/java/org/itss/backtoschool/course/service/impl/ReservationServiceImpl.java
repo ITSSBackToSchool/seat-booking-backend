@@ -84,7 +84,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .forEach(reservation -> reservation.setStatus(ReservationStatus.COMPLETED));
 
         reservationRepository.saveAll(reservations);
-        return "Rezervarile completate cu succes";
+        return "Rezervarile completate cu succes"; //return dto cu mesaj best practice
     }
 
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.controller.SeatController;
 import org.itss.backtoschool.course.dto.SeatDTO;
 import org.itss.backtoschool.course.entities.ReservationStatus;
+import org.itss.backtoschool.course.entities.Seat;
 import org.itss.backtoschool.course.service.SeatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +27,8 @@ public class SeatControllerImpl implements SeatController {
     }
 
     @Override
-    public List<SeatDTO> getAvailableSeats(LocalDateTime dateStart, LocalDateTime dateEnd) {
-        return seatService.getAvailableSeats(dateStart, dateEnd, ReservationStatus.ACTIVE);
+    public List<SeatDTO> findAvailableSeatsByRoomAndFloor(Long floorId, String buildingName, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        return seatService.findAvailableSeatsByRoomAndFloor(floorId,buildingName,dateStart,dateEnd);
     }
 
 }

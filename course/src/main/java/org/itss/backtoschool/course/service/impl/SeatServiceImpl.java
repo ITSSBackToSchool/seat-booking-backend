@@ -3,6 +3,7 @@ package org.itss.backtoschool.course.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.SeatDTO;
 import org.itss.backtoschool.course.entities.ReservationStatus;
+import org.itss.backtoschool.course.entities.Seat;
 import org.itss.backtoschool.course.mapper.SeatMapper;
 import org.itss.backtoschool.course.repository.SeatRepository;
 import org.itss.backtoschool.course.service.SeatService;
@@ -25,7 +26,9 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public List<SeatDTO> getAvailableSeats(LocalDateTime dateStart, LocalDateTime dateEnd, ReservationStatus status) {
-        return seatRepository.findAvailableSeats(dateStart, dateEnd, status).stream().map(seatMapper::toDTO).toList();
+    public List<SeatDTO> findAvailableSeatsByRoomAndFloor(Long floorId, String buildingName, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        return seatRepository.findAvailableSeatsByRoomAndFloor(floorId,buildingName,dateStart,dateEnd).stream().map(seatMapper::toDTO).toList();
     }
+
+
 }

@@ -2,6 +2,7 @@ package org.itss.backtoschool.course.service;
 
 import org.itss.backtoschool.course.dto.ReservationSeatDTO;
 import org.itss.backtoschool.course.dto.ReservationRoomDTO;
+import org.itss.backtoschool.course.dto.UserReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationSeatRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationSeatResponse;
@@ -18,4 +19,8 @@ public interface ReservationService {
     List<ReservationSeatDTO> getAllSeatReservations();
 
     List<ReservationRoomDTO> getAllRoomReservations();
+    
+    List<UserReservationDTO> getUserReservations(Long userId);
+    
+    void cancelReservation(Long reservationId);
 }

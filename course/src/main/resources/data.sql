@@ -31,9 +31,9 @@ INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('404', 'CONFERE
 INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Outland', 'CONFERENCE_ROOM', 10, 3);
 
 -- Insert Office Rooms
-INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Office Room Ground Floor', 'OFFICE_ROOM', 11, 1);
-INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Office Room First Floor', 'OFFICE_ROOM', 17, 2);
-INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Office Room Second Floor', 'OFFICE_ROOM', 16, 3);
+INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Office Room Ground Floor', 'DESK_ROOM', 11, 1);
+INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Office Room First Floor', 'DESK_ROOM', 17, 2);
+INSERT INTO room (name, room_type, seat_count, floor_id) VALUES ('Office Room Second Floor', 'DESK_ROOM', 16, 3);
 
 -- Insert Seats for Lounge (8 seats)
 INSERT INTO seat (seat_number, room_id) VALUES ('Seat 1', 1);

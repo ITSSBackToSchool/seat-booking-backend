@@ -2,7 +2,9 @@ package org.itss.backtoschool.course.dto.response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
+
 @Getter
 @Setter
 public class WeatherResponse {
@@ -15,6 +17,8 @@ public class WeatherResponse {
     private double elevation;
     private Map<String, String> current_units;
     private CurrentWeather current;
+    private Map<String, String> daily_units;
+    private DailyWeather daily;
 
     @Getter
     @Setter
@@ -25,5 +29,14 @@ public class WeatherResponse {
         private int relative_humidity_2m;
         private double precipitation;
         private double surface_pressure;
+    }
+
+    @Getter
+    @Setter
+    public static class DailyWeather {
+        private List<String> time;
+        private List<Double> temperature_2m_max;
+        private List<Double> temperature_2m_min;
+        private List<Double> precipitation_sum;
     }
 }

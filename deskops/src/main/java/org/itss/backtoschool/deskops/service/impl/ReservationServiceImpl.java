@@ -93,11 +93,19 @@ public class ReservationServiceImpl implements ReservationService {
 
             if (reservationDate.isBefore(today)) {
                 log.debug("Skipping traffic for past reservation {}", reservation.getId());
+                dto.setTraffic(TrafficDTO.builder()
+                        .available(false)
+                        .unavailableReason("Traffic data not available for past reservations")
+                        .build());
                 return;
             }
 
             if (reservationDate.isAfter(today.plusDays(5))) {
                 log.debug("Skipping traffic for distant reservation {} (more than 5 days away)", reservation.getId());
+                dto.setTraffic(TrafficDTO.builder()
+                        .available(false)
+                        .unavailableReason("Traffic data not available for reservations more than 5 days in advance")
+                        .build());
                 return;
             }
 
@@ -106,6 +114,10 @@ public class ReservationServiceImpl implements ReservationService {
             dto.setTraffic(traffic);
         } catch (Exception e) {
             log.error("Failed to fetch traffic for reservation {}: {}", reservation.getId(), e.getMessage(), e);
+            dto.setTraffic(TrafficDTO.builder()
+                    .available(false)
+                    .unavailableReason(e.getMessage())
+                    .build());
         }
     }
 
@@ -157,7 +169,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true)
     public CreateReservationResponse getAllReservations(Jwt jwt) {
-        var currentUser = userService.getOrCreateUser(jwt);
+        var currentUser = userService.findUser(jwt);
         var reservations = reservationRepository.findAll().stream()
                 .filter(r -> r.getUser().getId().equals(currentUser.getId()))
                 .toList();
@@ -181,7 +193,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true)
     public CreateReservationResponse getReservation(Long reservationId, Jwt jwt) {
-        var currentUser = userService.getOrCreateUser(jwt);
+        var currentUser = userService.findUser(jwt);
         var reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(ReservationNotFoundException::new);
 

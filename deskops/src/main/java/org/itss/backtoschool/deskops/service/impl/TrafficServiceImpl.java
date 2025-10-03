@@ -2,7 +2,6 @@ package org.itss.backtoschool.deskops.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.itss.backtoschool.deskops.dto.TrafficDTO;
-import org.itss.backtoschool.deskops.dto.request.GetTrafficRequest;
 import org.itss.backtoschool.deskops.dto.response.*;
 import org.itss.backtoschool.deskops.entities.User;
 import org.itss.backtoschool.deskops.exception.traffic.GeocodeException;
@@ -37,8 +36,6 @@ public class TrafficServiceImpl implements TrafficService {
     private static final String TRAFFIC_INCIDENTS_URL = "https://api.tomtom.com/traffic/services/5/incidentDetails";
 
     private static final int MAX_ROUTE_TIME_MINUTES = 45;
-    private static final double MIN_TRAFFIC_SPEED_KMH = 20.0;
-    private static final int MAX_INCIDENTS_COUNT = 3;
 
     @Value("${traffic.api-key}")
     private String apiKey;
@@ -95,10 +92,10 @@ public class TrafficServiceImpl implements TrafficService {
         Coordinates homeCoordinates = getCoordinates(user.getHomeStreet(), user.getHomeStreetNumber(), user.getHomeCity());
         Coordinates officeCoordinates = new Coordinates(location.getLatitude(), location.getLongitude());
         RouteInfo routeInfo = calculateRoute(homeCoordinates, officeCoordinates);
-        TrafficFlowInfo trafficFlow = getTrafficFlow(homeCoordinates);
+        getTrafficFlow(homeCoordinates);
         TrafficIncidentInfo incidents = getTrafficIncidents(homeCoordinates);
 
-        boolean shouldWorkFromHome = makeDecision(routeInfo, trafficFlow, incidents);
+        boolean shouldWorkFromHome = makeDecision(routeInfo, incidents);
         int travelTimeMinutes = routeInfo.getTravelTimeSeconds() / 60;
         int delayMinutes = routeInfo.getTrafficDelaySeconds() / 60;
 
@@ -107,6 +104,7 @@ public class TrafficServiceImpl implements TrafficService {
                 .delayMinutes(delayMinutes)
                 .workFromHomeRecommendation(shouldWorkFromHome)
                 .fetchedAt(ZonedDateTime.now(BUCHAREST_TIMEZONE).toLocalDateTime())
+                .available(true)
                 .build();
     }
 
@@ -177,7 +175,7 @@ public class TrafficServiceImpl implements TrafficService {
         }
     }
 
-    private TrafficFlowInfo getTrafficFlow(Coordinates coordinates) {
+    private void getTrafficFlow(Coordinates coordinates) {
         try {
             String point = String.format("%f,%f", coordinates.getLat(), coordinates.getLon());
 
@@ -192,12 +190,13 @@ public class TrafficServiceImpl implements TrafficService {
 
             if (response != null && response.getFlowSegmentData() != null) {
                 FlowSegmentData data = response.getFlowSegmentData();
-                return TrafficFlowInfo.builder()
+                TrafficFlowInfo.builder()
                         .currentSpeed(data.getCurrentSpeed())
                         .freeFlowSpeed(data.getFreeFlowSpeed())
                         .currentTravelTime(data.getCurrentTravelTime())
                         .freeFlowTravelTime(data.getFreeFlowTravelTime())
                         .build();
+                return;
             }
 
             throw new TrafficApiException("No traffic flow data found");
@@ -255,7 +254,7 @@ public class TrafficServiceImpl implements TrafficService {
         return iconCategory >= 1 && iconCategory <= 4;
     }
 
-    private boolean makeDecision(RouteInfo routeInfo, TrafficFlowInfo trafficFlow,
+    private boolean makeDecision(RouteInfo routeInfo,
                                  TrafficIncidentInfo incidents) {
 
         int travelTimeMinutes = routeInfo.getTravelTimeSeconds() / 60;

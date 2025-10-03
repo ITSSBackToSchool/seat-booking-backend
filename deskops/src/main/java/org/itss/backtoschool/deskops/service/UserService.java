@@ -5,4 +5,5 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 public interface UserService {
     User getOrCreateUser(Jwt jwt);
+    User findUser(Jwt jwt);
 }

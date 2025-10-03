@@ -3,6 +3,7 @@ package org.itss.backtoschool.deskops.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.itss.backtoschool.deskops.entities.User;
+import org.itss.backtoschool.deskops.exception.user.UserNotFoundException;
 import org.itss.backtoschool.deskops.repository.UserRepository;
 import org.itss.backtoschool.deskops.service.UserService;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -47,5 +48,18 @@ public class UserServiceImpl implements UserService {
                     newUser.setName(finalName);
                     return userRepository.save(newUser);
                 });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User findUser(Jwt jwt) {
+        String auth0UserId = jwt.getSubject();
+
+        if (auth0UserId == null || auth0UserId.isBlank()) {
+            throw new IllegalArgumentException("JWT subject (user ID) cannot be null or empty");
+        }
+
+        return userRepository.findByAuth0UserId(auth0UserId)
+                .orElseThrow(UserNotFoundException::new);
     }
 }

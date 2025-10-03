@@ -16,4 +16,6 @@ public class TrafficDTO {
     private Integer delayMinutes;
     private Boolean workFromHomeRecommendation;
     private LocalDateTime fetchedAt;
+    private Boolean available;
+    private String unavailableReason;
 }

@@ -53,12 +53,10 @@ public class ReservationServiceImpl implements ReservationService {
                 processReservation(seatId, user, request.getReservationDate(), createdReservations)
         );
 
-        // Eagerly fetch nested relationships before transaction ends
         for (Reservation createdReservation : createdReservations) {
             eagerlyFetchNestedEntities(createdReservation);
         }
 
-        // Enrich with weather and traffic outside transaction
         var reservationDTOs = createdReservations.stream()
                 .map(reservation -> {
                     var dto = reservationMapper.toDTO(reservation);
@@ -74,7 +72,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private void eagerlyFetchNestedEntities(Reservation reservation) {
-        // Force lazy loading of nested entities before transaction ends
         @SuppressWarnings("unused")
         var building = reservation.getSeat().getRoom().getFloor().getBuilding();
     }
@@ -94,7 +91,6 @@ public class ReservationServiceImpl implements ReservationService {
             LocalDate today = LocalDate.now();
             LocalDate reservationDate = reservation.getReservationDate();
 
-            // Only fetch traffic for reservations within the next 5 days (not in the past)
             if (reservationDate.isBefore(today)) {
                 log.debug("Skipping traffic for past reservation {}", reservation.getId());
                 return;
@@ -142,7 +138,6 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
 
-        // Limit reservations to 5 days in advance (matching weather forecast availability)
         LocalDate maxDate = today.plusDays(5);
         if (reservationDate.isAfter(maxDate)) {
             throw new InvalidReservationDateException("Reservations can only be made up to 5 days in advance");
@@ -167,10 +162,8 @@ public class ReservationServiceImpl implements ReservationService {
                 .filter(r -> r.getUser().getId().equals(currentUser.getId()))
                 .toList();
 
-        // Eagerly fetch nested relationships before transaction ends
         reservations.forEach(this::eagerlyFetchNestedEntities);
 
-        // Enrich with weather and traffic outside transaction
         var reservationDTOs = reservations.stream()
                 .map(reservation -> {
                     var dto = reservationMapper.toDTO(reservation);
@@ -194,10 +187,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         verifyOwnership(reservation, currentUser);
 
-        // Eagerly fetch nested relationships before transaction ends
         eagerlyFetchNestedEntities(reservation);
 
-        // Enrich with weather and traffic outside transaction
         var dto = reservationMapper.toDTO(reservation);
         enrichWithWeather(dto, reservation);
         enrichWithTraffic(dto, reservation);
@@ -230,7 +221,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         verifyOwnership(reservation, currentUser);
 
-        // Check if updating seat or date
         boolean seatChanged = request.getSeatId() != null && !request.getSeatId().equals(reservation.getSeat().getId());
         boolean dateChanged = request.getReservationDate() != null && !request.getReservationDate().equals(reservation.getReservationDate());
 
@@ -254,10 +244,8 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
         log.info("Updated reservation with ID: {}", reservationId);
 
-        // Eagerly fetch nested relationships before transaction ends
         eagerlyFetchNestedEntities(reservation);
 
-        // Enrich with weather and traffic outside transaction
         var dto = reservationMapper.toDTO(reservation);
         enrichWithWeather(dto, reservation);
         enrichWithTraffic(dto, reservation);

@@ -55,10 +55,8 @@ public class TrafficServiceImpl implements TrafficService {
 
     @Override
     public GetTrafficResponse getTrafficRecommendation(Long buildingId, Jwt jwt) {
-        // Get user from JWT
         User user = userService.getOrCreateUser(jwt);
 
-        // Check if user has configured home address
         if (user.getHomeStreet() == null || user.getHomeStreetNumber() == null || user.getHomeCity() == null) {
             throw new HomeAddressNotConfiguredException("User has not configured their home address");
         }
@@ -90,7 +88,6 @@ public class TrafficServiceImpl implements TrafficService {
     }
 
     private TrafficDTO calculateTrafficData(User user, Long buildingId) {
-        // Get building location
         var location = locationRepository.findByBuildingId(buildingId)
                 .orElseThrow(() -> new org.itss.backtoschool.deskops.exception.weather.LocationNotConfiguredException(
                         "Location not configured for building ID: " + buildingId));
@@ -214,7 +211,6 @@ public class TrafficServiceImpl implements TrafficService {
 
     private TrafficIncidentInfo getTrafficIncidents(Coordinates coordinates) {
         try {
-            // Create bounding box around the route (approximately 0.01 degrees ~ 1km)
             double bbox = 0.005;
             String bboxParam = String.format("%f,%f,%f,%f",
                     coordinates.getLon() - bbox, coordinates.getLat() - bbox,
@@ -263,32 +259,11 @@ public class TrafficServiceImpl implements TrafficService {
                                  TrafficIncidentInfo incidents) {
 
         int travelTimeMinutes = routeInfo.getTravelTimeSeconds() / 60;
-        int delayMinutes = routeInfo.getTrafficDelaySeconds() / 60;
 
-        // Recommend work from home if:
-        // 1. Travel time exceeds threshold
         if (travelTimeMinutes > MAX_ROUTE_TIME_MINUTES) {
             return true;
         }
 
-        // 2. Traffic speed is too slow
-        if (trafficFlow.getCurrentSpeed() < MIN_TRAFFIC_SPEED_KMH) {
-            return true;
-        }
-
-        // 3. Too many incidents on the route
-        if (incidents.getTotalIncidents() > MAX_INCIDENTS_COUNT) {
-            return true;
-        }
-
-        // 4. Any severe incidents
-        if (incidents.getSevereIncidents() > 0) {
-            return true;
-        }
-
-        // 5. Traffic delay is more than 50% of normal time
-        double delayRatio = routeInfo.getTrafficDelaySeconds() /
-                (double) (routeInfo.getTravelTimeSeconds() - routeInfo.getTrafficDelaySeconds());
-        return delayRatio > 0.5;
+        return incidents.getSevereIncidents() > 0;
     }
 }

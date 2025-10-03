@@ -39,7 +39,7 @@ public class OpenWeatherMapClient implements WeatherClient {
     }
 
     private String buildForecastUrl(Double latitude, Double longitude, Integer days) {
-        int count = (days != null && days > 0) ? days * 8 : 40; // 8 data points per day (3-hour intervals)
+        int count = (days != null && days > 0) ? days * 8 : 40;
 
         return UriComponentsBuilder.fromUriString(weatherApiConfig.getBaseUrl() + "/forecast")
                 .queryParam("lat", latitude)

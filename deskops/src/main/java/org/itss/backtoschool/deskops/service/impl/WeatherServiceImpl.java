@@ -38,7 +38,6 @@ public class WeatherServiceImpl implements WeatherService {
     public WeatherDTO getWeatherForDate(Long buildingId, LocalDate date) {
         Location location = getLocationByBuildingId(buildingId);
 
-        // Try to get from cache
         var cachedWeather = weatherDataRepository.findByLocationIdAndDate(location.getId(), date);
 
         if (cachedWeather.isPresent() && isCacheValid(cachedWeather.get())) {
@@ -46,7 +45,6 @@ public class WeatherServiceImpl implements WeatherService {
             return weatherMapper.toDTO(cachedWeather.get());
         }
 
-        // Fetch from external API and cache - use proxy to ensure new transaction
         WeatherService proxy = applicationContext.getBean(WeatherService.class);
         return ((WeatherServiceImpl) proxy).fetchAndCacheWeatherForDate(location, date);
     }
@@ -57,14 +55,12 @@ public class WeatherServiceImpl implements WeatherService {
         Location location = getLocationByBuildingId(buildingId);
         int forecastDays = (days != null && days > 0) ? days : 5;
 
-        // Fetch forecast from API
         OpenWeatherMapResponse response = weatherClient.fetchForecast(
                 location.getLatitude(),
                 location.getLongitude(),
                 forecastDays
         );
 
-        // Process and cache the forecast data
         List<WeatherDTO> forecast = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
@@ -90,7 +86,6 @@ public class WeatherServiceImpl implements WeatherService {
     protected WeatherDTO fetchAndCacheWeatherForDate(Location location, LocalDate date) {
         log.info("Fetching weather from external API for location {} on date {}", location.getCity(), date);
 
-        // Check if date is within forecast range (OpenWeatherMap provides 5-day forecast)
         LocalDate today = LocalDate.now();
         LocalDate maxForecastDate = today.plusDays(5);
 
@@ -116,13 +111,11 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     protected WeatherData findOrCreateWeatherDataForDate(OpenWeatherMapResponse response, Location location, LocalDate targetDate) {
-        // Check if already cached
         var existing = weatherDataRepository.findByLocationIdAndDate(location.getId(), targetDate);
         if (existing.isPresent() && isCacheValid(existing.get())) {
             return existing.get();
         }
 
-        // Find the forecast item closest to noon on the target date
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime targetDateTime = targetDate.atTime(12, 0);
 
@@ -141,7 +134,6 @@ public class WeatherServiceImpl implements WeatherService {
             return null;
         }
 
-        // Create and save weather data
         WeatherData weatherData = WeatherData.builder()
                 .location(location)
                 .date(targetDate)
@@ -155,7 +147,6 @@ public class WeatherServiceImpl implements WeatherService {
                 .fetchedAt(LocalDateTime.now())
                 .build();
 
-        // Delete old cache if exists
         existing.ifPresent(weatherDataRepository::delete);
 
         return weatherDataRepository.save(weatherData);
@@ -165,12 +156,10 @@ public class WeatherServiceImpl implements WeatherService {
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = LocalDate.now();
 
-        // Historical data is always valid
         if (weatherData.getDate().isBefore(today)) {
             return true;
         }
 
-        // For today and future dates, check TTL
         int ttlMinutes = weatherData.getDate().equals(today)
                 ? weatherApiConfig.getCache().getCurrentTtlMinutes()
                 : weatherApiConfig.getCache().getForecastTtlMinutes();

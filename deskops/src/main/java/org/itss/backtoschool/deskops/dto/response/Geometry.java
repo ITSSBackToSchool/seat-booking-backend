@@ -2,10 +2,8 @@ package org.itss.backtoschool.deskops.dto.response;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class Geometry {
     private String type;
-    private List<List<Double>> coordinates;
+    private Object coordinates; // Can be List<Double> (Point) or List<List<Double>> (LineString/Polygon)
 }

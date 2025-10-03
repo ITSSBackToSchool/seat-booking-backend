@@ -19,6 +19,12 @@ spring:
     init:
       mode: always
       data-locations: classpath:data.sql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://deskops.eu.auth0.com/
+          audiences: https://api.deskops.com
 
 server:
   port: 8080

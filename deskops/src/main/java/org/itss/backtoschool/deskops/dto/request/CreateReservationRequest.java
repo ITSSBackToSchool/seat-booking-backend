@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateReservationRequest {
-    private Long userId;
     private List<Long> seatIds;
     private LocalDate reservationDate;
 }

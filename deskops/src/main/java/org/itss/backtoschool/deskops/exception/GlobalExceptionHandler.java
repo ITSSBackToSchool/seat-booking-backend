@@ -1,6 +1,8 @@
 package org.itss.backtoschool.deskops.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.itss.backtoschool.deskops.exception.auth.UnauthorizedException;
+import org.itss.backtoschool.deskops.exception.reservation.InvalidReservationDateException;
 import org.itss.backtoschool.deskops.exception.reservation.ReservationNotFoundException;
 import org.itss.backtoschool.deskops.exception.seat.SeatAlreadyReservedException;
 import org.itss.backtoschool.deskops.exception.seat.SeatNotFoundException;
@@ -67,6 +69,48 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {
+        log.error("Unauthorized access: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.FORBIDDEN,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidReservationDateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidReservationDateException(InvalidReservationDateException ex, WebRequest request) {
+        log.error("Invalid reservation date: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex, WebRequest request) {
+        log.error("Invalid request body: {}", ex.getMessage());
+
+        String message = "Invalid request format. Please check your date format (use YYYY-MM-DD, e.g., 2025-10-08)";
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                message,
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

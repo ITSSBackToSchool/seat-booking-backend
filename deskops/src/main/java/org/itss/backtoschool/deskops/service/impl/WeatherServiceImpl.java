@@ -31,6 +31,7 @@ public class WeatherServiceImpl implements WeatherService {
     private final WeatherClient weatherClient;
     private final WeatherMapper weatherMapper;
     private final WeatherApiConfig weatherApiConfig;
+    private final org.springframework.context.ApplicationContext applicationContext;
 
     @Override
     @Transactional(readOnly = true)
@@ -45,8 +46,9 @@ public class WeatherServiceImpl implements WeatherService {
             return weatherMapper.toDTO(cachedWeather.get());
         }
 
-        // Fetch from external API and cache
-        return fetchAndCacheWeatherForDate(location, date);
+        // Fetch from external API and cache - use proxy to ensure new transaction
+        WeatherService proxy = applicationContext.getBean(WeatherService.class);
+        return ((WeatherServiceImpl) proxy).fetchAndCacheWeatherForDate(location, date);
     }
 
     @Override
@@ -84,9 +86,18 @@ public class WeatherServiceImpl implements WeatherService {
                         "Location not configured for building ID: " + buildingId));
     }
 
-    @Transactional
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     protected WeatherDTO fetchAndCacheWeatherForDate(Location location, LocalDate date) {
         log.info("Fetching weather from external API for location {} on date {}", location.getCity(), date);
+
+        // Check if date is within forecast range (OpenWeatherMap provides 5-day forecast)
+        LocalDate today = LocalDate.now();
+        LocalDate maxForecastDate = today.plusDays(5);
+
+        if (date.isAfter(maxForecastDate)) {
+            log.warn("Weather forecast not available for date {} (beyond 5-day forecast range)", date);
+            throw new WeatherDataNotFoundException("Weather forecast only available for the next 5 days");
+        }
 
         OpenWeatherMapResponse response = weatherClient.fetchForecast(
                 location.getLatitude(),
@@ -103,7 +114,7 @@ public class WeatherServiceImpl implements WeatherService {
         return weatherMapper.toDTO(weatherData);
     }
 
-    @Transactional
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     protected WeatherData findOrCreateWeatherDataForDate(OpenWeatherMapResponse response, Location location, LocalDate targetDate) {
         // Check if already cached
         var existing = weatherDataRepository.findByLocationIdAndDate(location.getId(), targetDate);

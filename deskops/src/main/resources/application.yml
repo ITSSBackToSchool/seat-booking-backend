@@ -2,7 +2,7 @@ spring:
   application:
     name: deskops
   datasource:
-    url: jdbc:mysql://localhost:3308/deskops_db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/deskops_db?createDatabaseIfNotExist=true
     username: user
     password: user1234
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -43,4 +43,4 @@ weather:
     longitude: 26.1025
 
 traffic:
-  api-key: ${TRAFFIC_API_KEY}
+  api-key: ${TRAFFIC_API_KEY:demo_key}

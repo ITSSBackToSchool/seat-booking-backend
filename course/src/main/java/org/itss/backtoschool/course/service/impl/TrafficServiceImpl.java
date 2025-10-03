@@ -10,9 +10,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class TrafficServiceImpl implements TrafficService {
 	private final RestTemplate restTemplate = new RestTemplate();
-
-
-
 	@Override
 	public TrafficRouteOption getDirections(String start, boolean traffic, String travelMode) {
 		String locatieITSS = "44.45050477369632,26.057440932852554";

@@ -129,6 +129,24 @@ public class ReservationServiceImpl implements ReservationService {
         );
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationSeatDTO> getAllSeatReservations() {
+        return reservationRepository.findAll().stream()
+                .filter(r -> r.getSeat() != null)
+                .map(reservationSeatMapper::toDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationRoomDTO> getAllRoomReservations() {
+        return reservationRepository.findAll().stream()
+                .filter(r -> r.getRoom() != null)
+                .map(reservationRoomMapper::toDTO)
+                .toList();
+    }
+
 
 
     private User loadUser(Long userId) {

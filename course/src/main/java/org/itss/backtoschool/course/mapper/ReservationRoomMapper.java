@@ -13,10 +13,7 @@ public interface ReservationRoomMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "reservationDate", target = "reservationDate")
     @Mapping(source = "status", target = "status")
-    @Mapping(source = "seat.id", target = "seatId")
-    @Mapping(source = "seat.room.name", target = "roomName")
-    @Mapping(source = "seat.room.floor.name", target = "floorName")
-    @Mapping(source = "seat.room.floor.building.name", target = "buildingName")
+
     @Mapping(source = "users.id", target = "userId")
     @Mapping(source = "users.userName", target = "userName")
     @Mapping(source = "users.email", target = "userEmail")

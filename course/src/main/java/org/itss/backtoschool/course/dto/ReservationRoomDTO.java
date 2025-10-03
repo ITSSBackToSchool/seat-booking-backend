@@ -15,7 +15,6 @@ public class ReservationRoomDTO {
     private Long id;
     private LocalDate reservationDate;
     private String status;
-    private Long SeatId;
     private String roomName;
     private String floorName;
     private String buildingName;

@@ -3,7 +3,9 @@ package org.itss.backtoschool.course.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.ReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
+import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
+import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
 import org.itss.backtoschool.course.entities.Reservation;
 import org.itss.backtoschool.course.entities.ReservationStatus;
 import org.itss.backtoschool.course.entities.Seat;
@@ -115,6 +117,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private boolean isSeatAlreadyReserved(Long seatId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd) {
-        return reservationRepository.existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(seatId, reservationDateStart, reservationDateStart, ReservationStatus.ACTIVE);
+        return reservationRepository.existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(seatId, reservationDateStart, reservationDateEnd, ReservationStatus.ACTIVE);
     }
 }

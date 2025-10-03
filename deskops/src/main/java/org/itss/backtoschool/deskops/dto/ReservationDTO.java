@@ -22,4 +22,5 @@ public class ReservationDTO {
     private String userName;
     private String userEmail;
     private WeatherDTO weather;
+    private TrafficDTO traffic;
 }

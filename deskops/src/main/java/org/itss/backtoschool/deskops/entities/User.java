@@ -22,6 +22,15 @@ public class User extends CommonEntity{
     @Column(nullable = false)
     private String email;
 
+    @Column
+    private String homeStreet;
+
+    @Column
+    private Integer homeStreetNumber;
+
+    @Column
+    private String homeCity;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Reservation> reservations;

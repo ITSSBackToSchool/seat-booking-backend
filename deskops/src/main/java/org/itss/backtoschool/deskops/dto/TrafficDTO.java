@@ -1,4 +1,4 @@
-package org.itss.backtoschool.deskops.dto.response;
+package org.itss.backtoschool.deskops.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class GetTrafficResponse {
+public class TrafficDTO {
     private Integer travelTimeMinutes;
     private Integer delayMinutes;
     private Boolean workFromHomeRecommendation;

@@ -6,6 +6,10 @@ import org.itss.backtoschool.deskops.exception.reservation.InvalidReservationDat
 import org.itss.backtoschool.deskops.exception.reservation.ReservationNotFoundException;
 import org.itss.backtoschool.deskops.exception.seat.SeatAlreadyReservedException;
 import org.itss.backtoschool.deskops.exception.seat.SeatNotFoundException;
+import org.itss.backtoschool.deskops.exception.traffic.GeocodeException;
+import org.itss.backtoschool.deskops.exception.traffic.HomeAddressNotConfiguredException;
+import org.itss.backtoschool.deskops.exception.traffic.RouteCalculationException;
+import org.itss.backtoschool.deskops.exception.traffic.TrafficApiException;
 import org.itss.backtoschool.deskops.exception.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +111,58 @@ public class GlobalExceptionHandler {
         var errorResponse = buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 message,
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(GeocodeException.class)
+    public ResponseEntity<ErrorResponse> handleGeocodeException(GeocodeException ex, WebRequest request) {
+        log.error("Geocode error: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(RouteCalculationException.class)
+    public ResponseEntity<ErrorResponse> handleRouteCalculationException(RouteCalculationException ex, WebRequest request) {
+        log.error("Route calculation error: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(TrafficApiException.class)
+    public ResponseEntity<ErrorResponse> handleTrafficApiException(TrafficApiException ex, WebRequest request) {
+        log.error("Traffic API error: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
+    @ExceptionHandler(HomeAddressNotConfiguredException.class)
+    public ResponseEntity<ErrorResponse> handleHomeAddressNotConfiguredException(HomeAddressNotConfiguredException ex, WebRequest request) {
+        log.error("Home address not configured: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
                 request.getDescription(false).replace("uri=", "")
         );
 

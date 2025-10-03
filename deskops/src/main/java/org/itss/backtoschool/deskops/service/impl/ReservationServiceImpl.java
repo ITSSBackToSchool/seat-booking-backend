@@ -2,6 +2,7 @@ package org.itss.backtoschool.deskops.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.itss.backtoschool.deskops.dto.TrafficDTO;
 import org.itss.backtoschool.deskops.dto.WeatherDTO;
 import org.itss.backtoschool.deskops.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.deskops.dto.response.CreateReservationResponse;
@@ -18,6 +19,7 @@ import org.itss.backtoschool.deskops.mapper.ReservationMapper;
 import org.itss.backtoschool.deskops.repository.ReservationRepository;
 import org.itss.backtoschool.deskops.repository.SeatRepository;
 import org.itss.backtoschool.deskops.service.ReservationService;
+import org.itss.backtoschool.deskops.service.TrafficService;
 import org.itss.backtoschool.deskops.service.UserService;
 import org.itss.backtoschool.deskops.service.WeatherService;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -37,6 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final SeatRepository seatRepository;
     private final ReservationMapper reservationMapper;
     private final WeatherService weatherService;
+    private final TrafficService trafficService;
     private final UserService userService;
 
 
@@ -55,11 +58,12 @@ public class ReservationServiceImpl implements ReservationService {
             eagerlyFetchNestedEntities(createdReservation);
         }
 
-        // Enrich with weather outside transaction
+        // Enrich with weather and traffic outside transaction
         var reservationDTOs = createdReservations.stream()
                 .map(reservation -> {
                     var dto = reservationMapper.toDTO(reservation);
                     enrichWithWeather(dto, reservation);
+                    enrichWithTraffic(dto, reservation);
                     return dto;
                 })
                 .toList();
@@ -82,6 +86,30 @@ public class ReservationServiceImpl implements ReservationService {
             dto.setWeather(weather);
         } catch (Exception e) {
             log.error("Failed to fetch weather for reservation {}: {}", reservation.getId(), e.getMessage(), e);
+        }
+    }
+
+    private void enrichWithTraffic(org.itss.backtoschool.deskops.dto.ReservationDTO dto, Reservation reservation) {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate reservationDate = reservation.getReservationDate();
+
+            // Only fetch traffic for reservations within the next 5 days (not in the past)
+            if (reservationDate.isBefore(today)) {
+                log.debug("Skipping traffic for past reservation {}", reservation.getId());
+                return;
+            }
+
+            if (reservationDate.isAfter(today.plusDays(5))) {
+                log.debug("Skipping traffic for distant reservation {} (more than 5 days away)", reservation.getId());
+                return;
+            }
+
+            Long buildingId = reservation.getSeat().getRoom().getFloor().getBuilding().getId();
+            TrafficDTO traffic = trafficService.getTrafficForUser(reservation.getUser(), buildingId);
+            dto.setTraffic(traffic);
+        } catch (Exception e) {
+            log.error("Failed to fetch traffic for reservation {}: {}", reservation.getId(), e.getMessage(), e);
         }
     }
 
@@ -142,11 +170,12 @@ public class ReservationServiceImpl implements ReservationService {
         // Eagerly fetch nested relationships before transaction ends
         reservations.forEach(this::eagerlyFetchNestedEntities);
 
-        // Enrich with weather outside transaction
+        // Enrich with weather and traffic outside transaction
         var reservationDTOs = reservations.stream()
                 .map(reservation -> {
                     var dto = reservationMapper.toDTO(reservation);
                     enrichWithWeather(dto, reservation);
+                    enrichWithTraffic(dto, reservation);
                     return dto;
                 })
                 .toList();
@@ -168,9 +197,10 @@ public class ReservationServiceImpl implements ReservationService {
         // Eagerly fetch nested relationships before transaction ends
         eagerlyFetchNestedEntities(reservation);
 
-        // Enrich with weather outside transaction
+        // Enrich with weather and traffic outside transaction
         var dto = reservationMapper.toDTO(reservation);
         enrichWithWeather(dto, reservation);
+        enrichWithTraffic(dto, reservation);
 
         return CreateReservationResponse.builder()
                 .reservations(List.of(dto))
@@ -227,9 +257,10 @@ public class ReservationServiceImpl implements ReservationService {
         // Eagerly fetch nested relationships before transaction ends
         eagerlyFetchNestedEntities(reservation);
 
-        // Enrich with weather outside transaction
+        // Enrich with weather and traffic outside transaction
         var dto = reservationMapper.toDTO(reservation);
         enrichWithWeather(dto, reservation);
+        enrichWithTraffic(dto, reservation);
 
         return CreateReservationResponse.builder()
                 .reservations(List.of(dto))

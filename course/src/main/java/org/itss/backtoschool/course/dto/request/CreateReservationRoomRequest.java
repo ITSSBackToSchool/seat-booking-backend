@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class CreateReservationRoomRequest {
 	private Long userId;
-	private Long roomdId;
+	private Long roomId;
 	private LocalDateTime reservationDateStart;
 	private LocalDateTime reservationDateEnd;
 }

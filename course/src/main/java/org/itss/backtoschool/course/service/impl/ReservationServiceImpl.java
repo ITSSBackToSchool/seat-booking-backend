@@ -5,18 +5,18 @@ import org.itss.backtoschool.course.dto.ReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
-import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
 import org.itss.backtoschool.course.entities.*;
 import org.itss.backtoschool.course.mapper.ReservationMapper;
 import org.itss.backtoschool.course.repository.ReservationRepository;
+import org.itss.backtoschool.course.repository.RoomRepository;
 import org.itss.backtoschool.course.repository.SeatRepository;
 import org.itss.backtoschool.course.repository.UserRepository;
 import org.itss.backtoschool.course.service.ReservationService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final SeatRepository seatRepository;
     private final UserRepository userRepository;
     private final ReservationMapper reservationMapper;
+    private final RoomRepository roomRepository;
 
 
     @Override
@@ -89,6 +90,21 @@ public class ReservationServiceImpl implements ReservationService {
         return "Rezervarile completate cu succes"; //return dto cu mesaj best practice
     }
 
+    @Override
+    @Transactional
+    public ReservationDTO createRoomReservation(CreateReservationRoomRequest request) {
+        if(request.getRoomId() == null)
+            throw new IllegalArgumentException("Rezervarea trebuie sa contina macar o camera!");
+
+        User user = loadUser(request.getUserId());
+        Reservation createdReservation = new Reservation();
+
+        processRoomReservation(request.getRoomId(),user, request.getReservationDateStart(),request.getReservationDateEnd(),createdReservation);
+
+        ReservationDTO createdReservationDTO = reservationMapper.toDTO(createdReservation);
+        return createdReservationDTO;
+    }
+
 
     private User loadUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(RuntimeException::new);
@@ -110,6 +126,21 @@ public class ReservationServiceImpl implements ReservationService {
         createdReservations.add(reservation);
     }
 
+    private void processRoomReservation(Long roomId, User user, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd, Reservation createdReservation){
+
+        Room room = roomRepository.findById(roomId).orElseThrow(()->new RuntimeException("Nu exista aceasta camera"));
+        validateRoomAvailability(room,reservationDateStart,reservationDateEnd);
+
+	    createdReservation = reservationRepository.save(Reservation.builder()
+	            .room(room)
+	            .reservationDateStart(reservationDateStart)
+	            .reservationDateEnd(reservationDateEnd)
+	            .user(user)
+                .status(ReservationStatus.ACTIVE)
+	            .build()
+	    );
+    }
+
     private void validateSeatAvailability(Seat seat, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd) {
         if (isSeatAlreadyReserved(seat.getId(), reservationDateStart, reservationDateEnd)) {
             throw new RuntimeException();
@@ -120,4 +151,14 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(seatId, reservationDateStart, reservationDateEnd, ReservationStatus.ACTIVE);
     }
 
+    private boolean isRoomAlreadyReserved(Long roomId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd){
+        return reservationRepository.existsByRoomIdAndReservationDateStartAndReservationDateEndAndStatus(roomId,reservationDateStart,reservationDateEnd,ReservationStatus.ACTIVE);
+    }
+
+    private void validateRoomAvailability(Room room,LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd){
+        if(isRoomAlreadyReserved(room.getId(),reservationDateStart,reservationDateEnd))
+        {
+            throw new IllegalTransactionStateException("Nu e valabila camera pentru acest interval");
+        }
+    }
 }

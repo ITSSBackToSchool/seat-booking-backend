@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.controller.ReservationController;
 import org.itss.backtoschool.course.dto.ReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
+import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 import org.itss.backtoschool.course.service.ReservationService;
 import org.springframework.http.HttpStatus;
@@ -39,5 +40,11 @@ public class ReservationControllerImpl implements ReservationController {
     @Override
     public String cancelReservation(Long reservationId) {
         return reservationService.cancelResevation(reservationId);
+    }
+
+    @Override
+    public ReservationDTO createRoomReservation(CreateReservationRoomRequest request) {
+        ReservationDTO response = reservationService.createRoomReservation(request);
+        return response;
     }
 }

@@ -19,10 +19,6 @@ public class Room extends CommonEntity {
     @Column(nullable = false)
     private Integer seatCount;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoomType roomType;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "floor_id",  nullable = false)
     @ToString.Exclude

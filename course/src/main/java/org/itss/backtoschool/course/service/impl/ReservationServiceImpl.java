@@ -97,9 +97,8 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalArgumentException("Rezervarea trebuie sa contina macar o camera!");
 
         User user = loadUser(request.getUserId());
-        Reservation createdReservation = new Reservation();
 
-        processRoomReservation(request.getRoomId(),user, request.getReservationDateStart(),request.getReservationDateEnd(),createdReservation);
+        Reservation createdReservation = processRoomReservation(request.getRoomId(),user, request.getReservationDateStart(),request.getReservationDateEnd());
 
         ReservationDTO createdReservationDTO = reservationMapper.toDTO(createdReservation);
         return createdReservationDTO;
@@ -126,12 +125,12 @@ public class ReservationServiceImpl implements ReservationService {
         createdReservations.add(reservation);
     }
 
-    private void processRoomReservation(Long roomId, User user, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd, Reservation createdReservation){
+    private Reservation processRoomReservation(Long roomId, User user, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd){
 
         Room room = roomRepository.findById(roomId).orElseThrow(()->new RuntimeException("Nu exista aceasta camera"));
         validateRoomAvailability(room,reservationDateStart,reservationDateEnd);
 
-	    createdReservation = reservationRepository.save(Reservation.builder()
+	    Reservation createdReservation = reservationRepository.save(Reservation.builder()
 	            .room(room)
 	            .reservationDateStart(reservationDateStart)
 	            .reservationDateEnd(reservationDateEnd)
@@ -139,6 +138,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .status(ReservationStatus.ACTIVE)
 	            .build()
 	    );
+        return createdReservation;
     }
 
     private void validateSeatAvailability(Seat seat, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd) {

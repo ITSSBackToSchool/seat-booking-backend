@@ -43,8 +43,8 @@ public class ReservationControllerImpl implements ReservationController {
     }
 
     @Override
-    public ReservationDTO createRoomReservation(CreateReservationRoomRequest request) {
+    public ResponseEntity<ReservationDTO> createRoomReservation(CreateReservationRoomRequest request) {
         ReservationDTO response = reservationService.createRoomReservation(request);
-        return response;
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

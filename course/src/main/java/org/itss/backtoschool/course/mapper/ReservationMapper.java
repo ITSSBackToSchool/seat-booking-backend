@@ -17,6 +17,7 @@ public interface ReservationMapper {
     @Mapping(source = "user.name", target = "userName")
     @Mapping(source = "user.email", target = "userEmail")
     @Mapping(source = "room.id",target = "roomId")
+    @Mapping(source = "room.name",target = "roomName")
     ReservationDTO toDTO(Reservation reservation);
 }
 

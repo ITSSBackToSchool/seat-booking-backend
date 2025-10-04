@@ -25,5 +25,5 @@ public interface ReservationController {
     String cancelReservation(@PathVariable Long reservationId);
 
     @PostMapping("/rooms")
-    ReservationDTO createRoomReservation(@RequestBody CreateReservationRoomRequest request);
+    ResponseEntity<ReservationDTO> createRoomReservation(@RequestBody CreateReservationRoomRequest request);
 }

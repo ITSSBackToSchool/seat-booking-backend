@@ -27,12 +27,13 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         )
     )
 """)
-
 	List<Seat> findAvailableSeatsByFloorAndReservationTime(
 			@Param("floorId") Long floorId,
 			@Param("dateStart") LocalDateTime dateStart,
 			@Param("dateEnd") LocalDateTime dateEnd
 	);
+
+	List<Seat> findSeatsByFloor_Id(Long floorId);
 
 
 

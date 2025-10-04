@@ -12,4 +12,5 @@ public class SeatDTO {
     private String seatNumber;
     private String floorName;
     private String buildingName;
+    private boolean isOccupied = false;
 }

@@ -25,7 +25,14 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public List<SeatDTO> findAvailableSeatsByFloorAndReservationTime(Long floorId, LocalDateTime dateStart, LocalDateTime dateEnd) {
-        return seatRepository.findAvailableSeatsByFloorAndReservationTime(floorId,dateStart,dateEnd).stream().map(seatMapper::toDTO).toList();
+        List<SeatDTO> availableSeats = seatRepository.findAvailableSeatsByFloorAndReservationTime(floorId,dateStart,dateEnd).stream().map(seatMapper::toDTO).toList();
+        List<SeatDTO> seatsByFloor = seatRepository.findSeatsByFloor_Id(floorId).stream().map(seatMapper::toDTO).toList();
+
+        for(SeatDTO seatDTO : seatsByFloor){
+            SeatDTO foundSeat = availableSeats.stream().filter(seat -> seat.getId().equals(seatDTO.getId())).findFirst().orElse(null);
+	        seatDTO.setOccupied(foundSeat == null);
+        }
+        return seatsByFloor;
     }
 
 }

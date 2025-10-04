@@ -6,10 +6,7 @@ import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
-import org.itss.backtoschool.course.entities.Reservation;
-import org.itss.backtoschool.course.entities.ReservationStatus;
-import org.itss.backtoschool.course.entities.Seat;
-import org.itss.backtoschool.course.entities.User;
+import org.itss.backtoschool.course.entities.*;
 import org.itss.backtoschool.course.mapper.ReservationMapper;
 import org.itss.backtoschool.course.repository.ReservationRepository;
 import org.itss.backtoschool.course.repository.SeatRepository;
@@ -37,6 +34,9 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public CreateReservationResponse createReservations(CreateReservationRequest request) {
+        if(request.getSeatIds() == null)
+            throw new IllegalArgumentException("Rezervarea trebuie sa contina macar un scaun!");
+
         var user = loadUser(request.getUserId());
         var createdReservations = new ArrayList<Reservation>();
 
@@ -119,4 +119,5 @@ public class ReservationServiceImpl implements ReservationService {
     private boolean isSeatAlreadyReserved(Long seatId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd) {
         return reservationRepository.existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(seatId, reservationDateStart, reservationDateEnd, ReservationStatus.ACTIVE);
     }
+
 }

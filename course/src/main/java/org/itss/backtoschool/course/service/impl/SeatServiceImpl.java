@@ -27,7 +27,7 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public List<SeatDTO> findAvailableSeatsByRoomAndFloor(Long floorId, String buildingName, LocalDateTime dateStart, LocalDateTime dateEnd) {
-        return seatRepository.findAvailableSeatsByRoomAndFloor(floorId,buildingName,dateStart,dateEnd).stream().map(seatMapper::toDTO).toList();
+        return seatRepository.findAvailableSeatsByFloorAndBuilding(floorId,buildingName,dateStart,dateEnd).stream().map(seatMapper::toDTO).toList();
     }
 
 

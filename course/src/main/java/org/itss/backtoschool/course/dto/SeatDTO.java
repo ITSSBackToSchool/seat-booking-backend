@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class SeatDTO {
     private Long id;
     private String seatNumber;
-    private String roomName;
     private String floorName;
     private String buildingName;
 }

@@ -17,9 +17,14 @@ public interface SeatController {
     @GetMapping
     ResponseEntity<List<SeatDTO>> getAllSeats();
 
+//    @GetMapping("/freeSeats")
+//    List<SeatDTO> findAvailableSeatsByRoomAndFloor(@Param("floor") Long floorId,
+//                                                @Param("building") String buildingName,
+//                                                @Param("dateStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateStart,
+//                                                @Param("dateEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateEnd);
     @GetMapping("/freeSeats")
-    List<SeatDTO> findAvailableSeatsByRoomAndFloor(@Param("floor") Long floorId,
-                                                @Param("building") String buildingName,
-                                                @Param("dateStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateStart,
-                                                @Param("dateEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateEnd);
+    List<SeatDTO> findAvailableSeatsByFloorAndReservationTime(
+        @RequestParam("floorId") Long floorId,
+        @RequestParam("dateStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateStart,
+        @RequestParam("dateEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateEnd);
 }

@@ -11,5 +11,5 @@ import java.util.List;
 
 public interface SeatService {
     List<SeatDTO> getAllSeats();
-    List<SeatDTO> findAvailableSeatsByRoomAndFloor(Long floorId, String buildingName, LocalDateTime dateStart, LocalDateTime dateEnd);
+    List<SeatDTO> findAvailableSeatsByFloorAndReservationTime(Long floorId, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

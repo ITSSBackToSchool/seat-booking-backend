@@ -6,12 +6,14 @@ import org.itss.backtoschool.course.dto.ReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
+import org.itss.backtoschool.course.dto.response.TimeSlot;
 import org.itss.backtoschool.course.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -46,5 +48,10 @@ public class ReservationControllerImpl implements ReservationController {
     public ResponseEntity<ReservationDTO> createRoomReservation(CreateReservationRoomRequest request) {
         ReservationDTO response = reservationService.createRoomReservation(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    public List<TimeSlot> findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(Long roomId, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        return reservationService.findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(roomId,dateStart,dateEnd);
     }
 }

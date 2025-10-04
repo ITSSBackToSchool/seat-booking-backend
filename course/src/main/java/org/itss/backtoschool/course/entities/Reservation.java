@@ -30,9 +30,14 @@ public class Reservation extends CommonEntity{
     @ToString.Exclude
     private Seat seat;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id",  nullable = false)
+    @ToString.Exclude
+    private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",  nullable = false)
     @ToString.Exclude
     private User user;
+
 }

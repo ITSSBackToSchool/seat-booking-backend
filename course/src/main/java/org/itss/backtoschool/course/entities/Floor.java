@@ -21,7 +21,10 @@ public class Floor extends CommonEntity{
     @ToString.Exclude
     private Building building;
 
+    @OneToMany(mappedBy = "floor")
+    private List<Room> rooms;
+
     @OneToMany(mappedBy = "floor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
-    private List<Room> rooms;
+    private List<Seat> seats;
 }

@@ -14,20 +14,20 @@ import java.util.List;
 
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long> {
-	@Query("SELECT s FROM Seat s " +
-			"WHERE s.room.floor.id = :floorId " +
-			"AND s.room.floor.building.name = :buildingName " +
-			"AND s.room.roomType = 'DESK_ROOM' " +
-			"AND s.id NOT IN (" +
-			"   SELECT r.seat.id FROM Reservation r " +
-			"   WHERE r.reservationDateStart = :dateStart " +
-			"   AND r.reservationDateEnd = :dateEnd" +
-			"   AND r.status='ACTIVE'" +
-			")")
-	List<Seat> findAvailableSeatsByRoomAndFloor(
+	@Query("""
+        SELECT s FROM Seat s
+        WHERE s.floor.id = :floorId
+          AND s.floor.building.name = :buildingName
+          AND s.id NOT IN (
+              SELECT r.seat.id FROM Reservation r
+              WHERE r.status = 'ACTIVE'
+                AND (r.reservationDateStart < :dateEnd AND r.reservationDateEnd > :dateStart)
+          )
+    """)
+	List<Seat> findAvailableSeatsByFloorAndBuilding(
 			@Param("floorId") Long floorId,
 			@Param("buildingName") String buildingName,
-			@Param("dateStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateStart,
-			@Param("dateEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateEnd);
-
+			@Param("dateStart") LocalDateTime dateStart,
+			@Param("dateEnd") LocalDateTime dateEnd
+	);
 }

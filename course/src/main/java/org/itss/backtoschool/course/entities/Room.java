@@ -28,7 +28,6 @@ public class Room extends CommonEntity {
     @ToString.Exclude
     private Floor floor;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private List<Seat> seats;
+    @OneToMany(mappedBy = "room")
+    private List<Reservation> reservations;
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/traffic")
+@RequestMapping("/traffic")
 @RequiredArgsConstructor
 public class TrafficControllerImpl implements TrafficController {
 	private final TrafficService trafficService;

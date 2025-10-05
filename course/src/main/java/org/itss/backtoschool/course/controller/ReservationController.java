@@ -30,9 +30,6 @@ public interface ReservationController {
     @PostMapping("/rooms")
     ResponseEntity<ReservationDTO> createRoomReservation(@RequestBody CreateReservationRoomRequest request);
 
-    @GetMapping("/timeslots")
-    List<TimeSlot> findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(
-            @Param("roomId") Long roomId, @Param("dateStart") LocalDateTime dateStart, @Param("dateEnd") LocalDateTime dateEnd
-    );
+
 
 }

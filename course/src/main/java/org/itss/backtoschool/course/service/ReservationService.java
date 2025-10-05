@@ -20,7 +20,5 @@ public interface ReservationService {
     @Scheduled(cron = "0 0 0 * * *")
     String completeReservations();
     ReservationDTO createRoomReservation(CreateReservationRoomRequest request);
-    List<TimeSlot> findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(
-            Long roomId, LocalDateTime dateEnd, LocalDateTime dateStart
-    );
+
 }

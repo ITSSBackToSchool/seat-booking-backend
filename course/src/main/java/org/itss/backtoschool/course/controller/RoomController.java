@@ -1,4 +1,4 @@
-package org.itss.backtoschool.course.controller.impl;
+package org.itss.backtoschool.course.controller;
 
 import org.itss.backtoschool.course.dto.response.TimeSlot;
 import org.springframework.data.repository.query.Param;
@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomController {
-	@GetMapping
+	@GetMapping("/timeslots")
 	List<TimeSlot> findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(
-			@Param("roomId") Long roomId, @Param("roomId") LocalDateTime dateEnd, LocalDateTime dateStart
+			@Param("roomId") Long roomId, @Param("dateStart") LocalDateTime dateStart, @Param("dateEnd") LocalDateTime dateEnd
 	);
 }

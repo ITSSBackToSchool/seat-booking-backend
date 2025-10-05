@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/seats")
+@RequestMapping("/seats")
 @RequiredArgsConstructor
 public class SeatControllerImpl implements SeatController {
 

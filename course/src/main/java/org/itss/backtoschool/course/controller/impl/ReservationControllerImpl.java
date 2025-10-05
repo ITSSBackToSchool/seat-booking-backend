@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reservations")
+@RequestMapping("/reservations")
 @RequiredArgsConstructor
 public class ReservationControllerImpl implements ReservationController {
 
@@ -50,8 +50,5 @@ public class ReservationControllerImpl implements ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Override
-    public List<TimeSlot> findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(Long roomId, LocalDateTime dateStart, LocalDateTime dateEnd) {
-        return reservationService.findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(roomId,dateStart,dateEnd);
-    }
+
 }

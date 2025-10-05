@@ -2,12 +2,15 @@ package org.itss.backtoschool.course.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.ReservationDTO;
+import org.itss.backtoschool.course.dto.RoomDTO;
 import org.itss.backtoschool.course.dto.response.TimeSlot;
 import org.itss.backtoschool.course.entities.Reservation;
 import org.itss.backtoschool.course.entities.ReservationStatus;
+import org.itss.backtoschool.course.entities.Room;
 import org.itss.backtoschool.course.mapper.ReservationMapper;
+import org.itss.backtoschool.course.mapper.RoomMapper;
 import org.itss.backtoschool.course.repository.ReservationRepository;
-import org.itss.backtoschool.course.service.ReservationService;
+import org.itss.backtoschool.course.repository.RoomRepository;
 import org.itss.backtoschool.course.service.RoomService;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,8 @@ import java.util.List;
 public class RoomServiceImpl implements RoomService {
 	private final ReservationRepository reservationRepository;
 	private final ReservationMapper reservationMapper;
+	private final RoomRepository roomRepository;
+	private final RoomMapper roomMapper;
 
 	@Override
 	public List<TimeSlot> findByRoom_IdAndReservationDateStartLessThanAndReservationDateEndGreaterThan(Long roomId, LocalDateTime dateEnd, LocalDateTime dateStart) {
@@ -47,6 +52,11 @@ public class RoomServiceImpl implements RoomService {
 		}
 
 		return allTimeSlots;
+	}
+
+	@Override
+	public List<RoomDTO> findAllByFloorNameAndFloor_Building_Name(String floorName, String buildingName) {
+		return roomRepository.findAllByFloorNameAndFloor_Building_Name(floorName, buildingName).stream().map(roomMapper::toDTO).toList();
 	}
 
 	public List<TimeSlot> splitHoursIntoIntervals(ReservationDTO reservationDTO){

@@ -2,7 +2,6 @@ package org.itss.backtoschool.deskops.controller.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.deskops.controller.TrafficController;
-import org.itss.backtoschool.deskops.dto.request.GetTrafficRequest;
 import org.itss.backtoschool.deskops.dto.response.GetTrafficResponse;
 import org.itss.backtoschool.deskops.service.TrafficService;
 import org.springframework.http.ResponseEntity;

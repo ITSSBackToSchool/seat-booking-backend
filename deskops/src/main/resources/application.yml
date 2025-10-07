@@ -44,3 +44,13 @@ weather:
 
 traffic:
   api-key: ${TRAFFIC_API_KEY:demo_key}
+
+auth0:
+  management:
+    domain: ${AUTH0_DOMAIN:deskops.eu.auth0.com}
+    client-id: ${AUTH0_MGMT_CLIENT_ID}
+    client-secret: ${AUTH0_MGMT_CLIENT_SECRET}
+  roles:
+    employee-id: ${AUTH0_EMPLOYEE_ROLE_ID}
+    hr-id: ${AUTH0_HR_ROLE_ID}
+    admin-id: ${AUTH0_ADMIN_ROLE_ID}

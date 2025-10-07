@@ -117,7 +117,6 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         ZoneId zoneId = ZoneId.systemDefault();
-        LocalDateTime targetDateTime = targetDate.atTime(12, 0);
 
         OpenWeatherMapResponse.ForecastItem closestItem = response.getForecastList().stream()
                 .filter(item -> {

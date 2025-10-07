@@ -6,6 +6,9 @@ import org.itss.backtoschool.deskops.entities.ReservationStatus;
 import org.itss.backtoschool.deskops.mapper.SeatMapper;
 import org.itss.backtoschool.deskops.repository.ReservationRepository;
 import org.itss.backtoschool.deskops.repository.SeatRepository;
+import org.itss.backtoschool.deskops.repository.RoomRepository;
+import org.itss.backtoschool.deskops.entities.Seat;
+import org.itss.backtoschool.deskops.entities.Room;
 import org.itss.backtoschool.deskops.service.SeatService;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ public class SeatServiceImpl implements SeatService {
     private final SeatRepository seatRepository;
     private final SeatMapper seatMapper;
     private final ReservationRepository reservationRepository;
+    private final RoomRepository roomRepository;
 
     @Override
     public List<SeatDTO> getAllSeats() {
@@ -36,5 +40,19 @@ public class SeatServiceImpl implements SeatService {
                 .toList();
 
         return seatMapper.toDTOList(availableSeats);
+    }
+
+    @Override
+    public SeatDTO createSeat(String seatNumber, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
+
+        Seat seat = new Seat();
+        seat.setSeatNumber(seatNumber);
+        seat.setRoom(room);
+
+        Seat saved = seatRepository.save(seat);
+
+        return seatMapper.toDTO(saved);
     }
 }

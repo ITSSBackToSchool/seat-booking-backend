@@ -34,16 +34,4 @@ public class User extends CommonEntity{
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Reservation> reservations;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private List<Role> roles;
-
-    /**
-     * Check whether this user has the given permission via any ACTIVE role.
-     */
-    public boolean hasPermission(Permission permission) {
-        if (roles == null) return false;
-        return roles.stream().anyMatch(role -> role != null && role.hasPermission(permission));
-    }
 }

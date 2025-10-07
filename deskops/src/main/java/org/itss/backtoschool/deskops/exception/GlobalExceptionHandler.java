@@ -1,6 +1,7 @@
 package org.itss.backtoschool.deskops.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.itss.backtoschool.deskops.exception.auth.InsufficientPermissionException;
 import org.itss.backtoschool.deskops.exception.auth.UnauthorizedException;
 import org.itss.backtoschool.deskops.exception.reservation.InvalidReservationDateException;
 import org.itss.backtoschool.deskops.exception.reservation.ReservationNotFoundException;
@@ -78,6 +79,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {
         log.error("Unauthorized access: {}", ex.getMessage());
+
+        var errorResponse = buildErrorResponse(
+                HttpStatus.FORBIDDEN,
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(InsufficientPermissionException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientPermissionException(InsufficientPermissionException ex, WebRequest request) {
+        log.warn("Insufficient permission: {}", ex.getMessage());
 
         var errorResponse = buildErrorResponse(
                 HttpStatus.FORBIDDEN,

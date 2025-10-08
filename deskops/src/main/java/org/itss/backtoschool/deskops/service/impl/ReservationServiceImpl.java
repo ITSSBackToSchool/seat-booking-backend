@@ -6,10 +6,7 @@ import org.itss.backtoschool.deskops.dto.TrafficDTO;
 import org.itss.backtoschool.deskops.dto.WeatherDTO;
 import org.itss.backtoschool.deskops.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.deskops.dto.response.CreateReservationResponse;
-import org.itss.backtoschool.deskops.entities.Reservation;
-import org.itss.backtoschool.deskops.entities.ReservationStatus;
-import org.itss.backtoschool.deskops.entities.Seat;
-import org.itss.backtoschool.deskops.entities.User;
+import org.itss.backtoschool.deskops.entities.*;
 import org.itss.backtoschool.deskops.exception.auth.UnauthorizedException;
 import org.itss.backtoschool.deskops.exception.reservation.InvalidReservationDateException;
 import org.itss.backtoschool.deskops.exception.reservation.ReservationNotFoundException;
@@ -17,16 +14,19 @@ import org.itss.backtoschool.deskops.exception.seat.SeatAlreadyReservedException
 import org.itss.backtoschool.deskops.exception.seat.SeatNotFoundException;
 import org.itss.backtoschool.deskops.mapper.ReservationMapper;
 import org.itss.backtoschool.deskops.repository.ReservationRepository;
+import org.itss.backtoschool.deskops.repository.RoomRepository;
 import org.itss.backtoschool.deskops.repository.SeatRepository;
 import org.itss.backtoschool.deskops.service.ReservationService;
 import org.itss.backtoschool.deskops.service.TrafficService;
 import org.itss.backtoschool.deskops.service.UserService;
 import org.itss.backtoschool.deskops.service.WeatherService;
+import org.itss.backtoschool.deskops.validator.ReservationValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +37,12 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final SeatRepository seatRepository;
+    private final RoomRepository roomRepository;
     private final ReservationMapper reservationMapper;
     private final WeatherService weatherService;
     private final TrafficService trafficService;
     private final UserService userService;
+    private final ReservationValidator reservationValidator;
 
 
     @Override
@@ -49,14 +51,47 @@ public class ReservationServiceImpl implements ReservationService {
         var user = userService.getOrCreateUser(jwt);
         var createdReservations = new ArrayList<Reservation>();
 
-        request.getSeatIds().forEach(seatId ->
-                processReservation(seatId, user, request.getReservationDate(), createdReservations)
+        // Get the first seat to determine the room and validate request
+        Long firstSeatId = request.getSeatIds().getFirst();
+        Seat firstSeat = seatRepository.findById(firstSeatId)
+                .orElseThrow(SeatNotFoundException::new);
+        Room room = firstSeat.getRoom();
+
+        // Validate request based on room type
+        reservationValidator.validateReservationRequest(request, room);
+
+        // Determine which seats to book
+        List<Long> seatsToBook;
+        if (Boolean.TRUE.equals(request.getBookEntireRoom())) {
+            // Book ALL seats in the room
+            seatsToBook = getAllSeatIdsInRoom(room.getId());
+            log.info("Booking entire room '{}' with {} seats for user {}",
+                room.getName(), seatsToBook.size(), user.getId());
+        } else {
+            // Book only requested seats
+            seatsToBook = request.getSeatIds();
+            log.debug("Booking {} specific seats for user {}", seatsToBook.size(), user.getId());
+        }
+
+        // Create reservations for each seat
+        seatsToBook.forEach(seatId ->
+            processReservation(
+                seatId,
+                user,
+                request.getReservationDate(),
+                request.getStartTime(),
+                request.getEndTime(),
+                Boolean.TRUE.equals(request.getBookEntireRoom()),
+                createdReservations
+            )
         );
 
+        // Eagerly fetch nested entities to avoid lazy loading issues
         for (Reservation createdReservation : createdReservations) {
             eagerlyFetchNestedEntities(createdReservation);
         }
 
+        // Map to DTOs and enrich with weather/traffic
         var reservationDTOs = createdReservations.stream()
                 .map(reservation -> {
                     var dto = reservationMapper.toDTO(reservation);
@@ -69,6 +104,18 @@ public class ReservationServiceImpl implements ReservationService {
         return CreateReservationResponse.builder()
                 .reservations(reservationDTOs)
                 .build();
+    }
+
+    /**
+     * Get all seat IDs in a room (used for booking entire conference room).
+     */
+    private List<Long> getAllSeatIdsInRoom(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
+
+        return room.getSeats().stream()
+                .map(Seat::getId)
+                .toList();
     }
 
     private void eagerlyFetchNestedEntities(Reservation reservation) {
@@ -127,14 +174,28 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    private void processReservation(Long seatId, User user, LocalDate reservationDate, List<Reservation> createdReservations) {
+    private void processReservation(
+        Long seatId,
+        User user,
+        LocalDate reservationDate,
+        LocalTime startTime,
+        LocalTime endTime,
+        boolean bookEntireRoom,
+        List<Reservation> createdReservations
+    ) {
         validateReservationDate(reservationDate);
 
-        var seat = seatRepository.findById(seatId).orElseThrow(SeatNotFoundException::new);
-        validateSeatAvailability(seat, reservationDate);
+        var seat = seatRepository.findById(seatId)
+                .orElseThrow(SeatNotFoundException::new);
+
+        // Check availability (time-aware for conference/collaborative/recreational rooms)
+        validateSeatAvailability(seat, reservationDate, startTime, endTime);
 
         var reservation = reservationRepository.save(Reservation.builder()
                 .reservationDate(reservationDate)
+                .startTime(startTime)
+                .endTime(endTime)
+                .bookEntireRoom(bookEntireRoom)
                 .status(ReservationStatus.ACTIVE)
                 .seat(seat)
                 .user(user)
@@ -156,14 +217,45 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
-    private void validateSeatAvailability(Seat seat, LocalDate reservationDate) {
-        if (isSeatAlreadyReserved(seat.getId(), reservationDate)) {
-            throw new SeatAlreadyReservedException();
+    private void validateSeatAvailability(
+        Seat seat,
+        LocalDate reservationDate,
+        LocalTime startTime,
+        LocalTime endTime
+    ) {
+        RoomType roomType = seat.getRoom().getRoomType();
+
+        if (roomType == RoomType.DESK_ROOM) {
+            // DESK_ROOM: Check all-day availability
+            if (isSeatAlreadyReserved(seat.getId(), reservationDate)) {
+                throw new SeatAlreadyReservedException(
+                    "Seat is already reserved for this date"
+                );
+            }
+        } else {
+            // CONFERENCE_ROOM, COLLABORATIVE, RECREATIONAL: Check time slot overlap
+            boolean hasOverlap = reservationRepository.existsOverlappingReservation(
+                seat.getId(),
+                reservationDate,
+                startTime,
+                endTime,
+                ReservationStatus.ACTIVE
+            );
+
+            if (hasOverlap) {
+                throw new SeatAlreadyReservedException(
+                    "Seat is already reserved for overlapping time slot"
+                );
+            }
         }
     }
 
     private boolean isSeatAlreadyReserved(Long seatId, LocalDate reservationDate) {
-        return reservationRepository.existsBySeatIdAndReservationDateAndStatus(seatId, reservationDate, ReservationStatus.ACTIVE);
+        return reservationRepository.existsBySeatIdAndReservationDateAndStatus(
+            seatId,
+            reservationDate,
+            ReservationStatus.ACTIVE
+        );
     }
 
     @Override
@@ -235,22 +327,35 @@ public class ReservationServiceImpl implements ReservationService {
 
         boolean seatChanged = request.getSeatId() != null && !request.getSeatId().equals(reservation.getSeat().getId());
         boolean dateChanged = request.getReservationDate() != null && !request.getReservationDate().equals(reservation.getReservationDate());
+        boolean timeChanged = request.getStartTime() != null || request.getEndTime() != null;
 
         if (dateChanged) {
             validateReservationDate(request.getReservationDate());
         }
 
+        // Determine target date and times for validation
+        LocalDate targetDate = request.getReservationDate() != null ? request.getReservationDate() : reservation.getReservationDate();
+        LocalTime targetStartTime = request.getStartTime() != null ? request.getStartTime() : reservation.getStartTime();
+        LocalTime targetEndTime = request.getEndTime() != null ? request.getEndTime() : reservation.getEndTime();
+
         if (seatChanged) {
             var newSeat = seatRepository.findById(request.getSeatId())
                     .orElseThrow(SeatNotFoundException::new);
-            LocalDate targetDate = request.getReservationDate() != null ? request.getReservationDate() : reservation.getReservationDate();
-            validateSeatAvailability(newSeat, targetDate);
+            validateSeatAvailability(newSeat, targetDate, targetStartTime, targetEndTime);
             reservation.setSeat(newSeat);
         }
 
-        if (dateChanged) {
-            validateSeatAvailability(reservation.getSeat(), request.getReservationDate());
-            reservation.setReservationDate(request.getReservationDate());
+        if (dateChanged || timeChanged) {
+            validateSeatAvailability(reservation.getSeat(), targetDate, targetStartTime, targetEndTime);
+            if (dateChanged) {
+                reservation.setReservationDate(request.getReservationDate());
+            }
+            if (request.getStartTime() != null) {
+                reservation.setStartTime(request.getStartTime());
+            }
+            if (request.getEndTime() != null) {
+                reservation.setEndTime(request.getEndTime());
+            }
         }
 
         reservationRepository.save(reservation);

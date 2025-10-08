@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.itss.backtoschool.deskops.dto.CreateRoomRequest;
 import org.itss.backtoschool.deskops.dto.RoomDTO;
+import org.itss.backtoschool.deskops.dto.response.RoomAvailabilityResponse;
 import org.itss.backtoschool.deskops.entities.User;
 import org.itss.backtoschool.deskops.service.RoomService;
 import org.itss.backtoschool.deskops.service.UserService;
 import org.itss.backtoschool.deskops.config.security.CurrentUser;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
@@ -36,5 +36,25 @@ public class RoomControllerImpl {
         log.info("User '{}' (id: {}) creating room '{}'", user.getName(), user.getId(), request.getName());
         RoomDTO created = roomService.createRoom(request);
         return ResponseEntity.status(201).body(created);
+    }
+
+    /**
+     * Get the complete availability timeline for a room on a specific date.
+     * Shows all booked and available time slots.
+     * Example: GET /api/rooms/4/availability?date=2025-10-15
+     *
+     * @param roomId the room ID
+     * @param date the date to check (format: yyyy-MM-dd)
+     * @return complete timeline with booked and available slots
+     */
+    @GetMapping("/{roomId}/availability")
+    @PreAuthorize("hasAuthority('VIEW_SEATS')")
+    public ResponseEntity<RoomAvailabilityResponse> getRoomAvailability(
+            @PathVariable Long roomId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        log.debug("Getting availability for room {} on date {}", roomId, date);
+        RoomAvailabilityResponse availability = roomService.getRoomAvailability(roomId, date);
+        return ResponseEntity.ok(availability);
     }
 }

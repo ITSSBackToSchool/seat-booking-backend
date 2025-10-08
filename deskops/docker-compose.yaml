@@ -12,6 +12,12 @@ services:
       - spring.datasource.url=jdbc:mysql://db:3306/deskops_db
       - WEATHER_API_KEY=${WEATHER_API_KEY:-demo_key}
       - TRAFFIC_API_KEY=${TRAFFIC_API_KEY:-demo_key}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN:-deskops.eu.auth0.com}
+      - AUTH0_MGMT_CLIENT_ID=${AUTH0_MGMT_CLIENT_ID}
+      - AUTH0_MGMT_CLIENT_SECRET=${AUTH0_MGMT_CLIENT_SECRET}
+      - AUTH0_EMPLOYEE_ROLE_ID=${AUTH0_EMPLOYEE_ROLE_ID}
+      - AUTH0_HR_ROLE_ID=${AUTH0_HR_ROLE_ID}
+      - AUTH0_ADMIN_ROLE_ID=${AUTH0_ADMIN_ROLE_ID}
     restart: on-failure
 
   db:

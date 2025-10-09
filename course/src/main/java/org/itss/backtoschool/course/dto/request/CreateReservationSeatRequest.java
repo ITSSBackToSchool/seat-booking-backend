@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateReservationSeatRequest {
     private Long userId;
-    private List<Long> seatIds;
+    private List<Long> seatId;
     private LocalDate reservationDate;
    private LocalTime startTime;
    private LocalTime endTime;

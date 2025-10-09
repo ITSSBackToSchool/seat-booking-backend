@@ -85,7 +85,7 @@ public class SeatServiceImpl implements SeatService {
             // If not available, add reservation info
             if (!overlapping.isEmpty()) {
                 Reservation reservation = overlapping.get(0);
-                dto.setReservedBy(reservation.getUsers().getEmail());
+                dto.setReservedBy(reservation.getUsers().getUserName());
                 dto.setReservedTime(reservation.getStartTime() + " - " + reservation.getEndTime());
             }
             

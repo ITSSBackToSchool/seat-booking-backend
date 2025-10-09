@@ -26,8 +26,8 @@ public class User extends CommonEntity {
     @Column
     private String phone;
 
-    @Column(name = "home_adress")
-    private String homeAdress;
+    @Column(name = "home_address")
+    private String homeAddress;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude

@@ -45,7 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
         LocalTime startTime = request.getStartTime() != null ? request.getStartTime() : LocalTime.of(9, 0);
         LocalTime endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusHours(1);
 
-        for (Long seatId : request.getSeatIds()) {
+        for (Long seatId : request.getSeatId()) {
             createdReservations.add(createReservationForSeat(seatId, user, date, startTime, endTime));
         }
 
@@ -93,8 +93,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true)
     public List<ReservationRoomDTO> getAllRoomReservations() {
-        return reservationRepository.findAll().stream()
-                .filter(r -> r.getRoom() != null && r.getSeat() == null)
+        return reservationRepository.findAllRoomReservationsWithDetails().stream()
                 .map(r -> ReservationRoomDTO.builder()
                         .id(r.getId())
                         .reservationDate(r.getReservationDate())

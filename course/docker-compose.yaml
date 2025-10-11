@@ -10,6 +10,7 @@ services:
       - 8080:8080
     environment:
       - spring.datasource.url=jdbc:mysql://db:3306/seat_booking_db
+    restart: unless-stopped
 
   db:
     image: mysql
@@ -23,7 +24,7 @@ services:
       MYSQL_DATABASE: seat_booking_db
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-puser1234"]
-      interval: 5s
+      interval: 3s
       timeout: 3s
       retries: 10
-      start_period: 30s
+      start_period: 10s

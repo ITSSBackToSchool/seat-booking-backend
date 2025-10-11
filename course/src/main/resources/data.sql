@@ -114,5 +114,5 @@ INSERT INTO seat (seat_number, room_id) VALUES ('Seat 4', 7);
 INSERT INTO seat (seat_number, room_id) VALUES ('Seat 5', 7);
 
 -- Insert Sample Users
-INSERT INTO user (name, email) VALUES ('Bogdan David', 'bogdan.david@email.com');
-INSERT INTO user (name, email) VALUES ('Test Test', 'test.test@email.com');
+INSERT INTO users (user_name, email, password, phone, home_address) VALUES ('Bogdan David', 'bogdan.david@email.com', 'password123', '0712345678', 'Bucuresti');
+INSERT INTO users (user_name, email, password, phone, home_address) VALUES ('Test Test', 'test.test@email.com', 'password456', '0722334455', 'Cluj');

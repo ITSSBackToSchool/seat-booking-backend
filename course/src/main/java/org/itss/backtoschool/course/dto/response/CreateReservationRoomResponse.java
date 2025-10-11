@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.itss.backtoschool.course.dto.ReservationDTO;
+import org.itss.backtoschool.course.dto.ReservationRoomDTO;
 
 import java.util.List;
 
@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateReservationResponse {
-    private List<ReservationDTO> reservations;
+public class CreateReservationRoomResponse {
+    private List<ReservationRoomDTO> reservations;
 }

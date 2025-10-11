@@ -2,6 +2,7 @@ package org.itss.backtoschool.course.controller.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.controller.ReservationController;
+import org.itss.backtoschool.course.dto.UserReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationSeatRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
@@ -22,7 +23,6 @@ public class ReservationControllerImpl implements ReservationController {
     private final ReservationService reservationService;
 
     @Override
-    @PostMapping("/rooms")
     public ResponseEntity<?> createRoomReservations(
             @RequestBody CreateReservationRoomRequest request) {
 
@@ -40,7 +40,6 @@ public class ReservationControllerImpl implements ReservationController {
     }
 
     @Override
-    @PostMapping("/seats")
     public ResponseEntity<?> createSeatReservations(
             @RequestBody CreateReservationSeatRequest request) {
 
@@ -67,5 +66,18 @@ public class ReservationControllerImpl implements ReservationController {
     public ResponseEntity<List<ReservationRoomDTO>> getAllRoomReservations() {
         List<ReservationRoomDTO> reservations = reservationService.getAllRoomReservations();
         return ResponseEntity.ok(reservations);
+    }
+    
+    @Override
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<UserReservationDTO>> getUserReservations(@PathVariable Long userId) {
+        return ResponseEntity.ok(reservationService.getUserReservations(userId));
+    }
+    
+    @Override
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<Void> cancelReservation(@PathVariable Long reservationId) {
+        reservationService.cancelReservation(reservationId);
+        return ResponseEntity.noContent().build();
     }
 }

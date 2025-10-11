@@ -2,6 +2,7 @@ package org.itss.backtoschool.course.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.UserDTO;
+import org.itss.backtoschool.course.security.JwtService;
 import org.itss.backtoschool.course.security.JwtUtil;
 import org.itss.backtoschool.course.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
@@ -26,7 +28,7 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(userOpt.get().getUserName());
+        String token = jwtService.generateToken(userOpt.get().getUserName());
         return ResponseEntity.ok(token);
     }
 

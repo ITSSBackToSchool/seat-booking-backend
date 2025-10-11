@@ -41,7 +41,7 @@ public class FloorServiceImpl implements FloorService {
         floorRepository.findById(floorId)
                 .orElseThrow(() -> new RuntimeException("Floor not found with id: " + floorId));
         
-        var rooms = roomRepository.findByFloorId(floorId);
+        var rooms = roomRepository.findByfloorId(floorId);
         return roomMapper.toDTOList(rooms);
     }
     

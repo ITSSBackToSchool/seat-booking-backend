@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Entity
@@ -12,7 +13,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Builder
+@SuperBuilder
 public class Reservation extends CommonEntity {
 
     @Column(nullable = false)

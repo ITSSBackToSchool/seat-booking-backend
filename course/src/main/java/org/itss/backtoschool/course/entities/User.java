@@ -2,7 +2,8 @@ package org.itss.backtoschool.course.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
 import java.util.List;
 
 @Data
@@ -11,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Builder
+@SuperBuilder
 public class User extends CommonEntity {
 
     @Column(nullable = false)
@@ -27,7 +28,7 @@ public class User extends CommonEntity {
     private String phone;
 
     @Column(name = "home_adress")
-    private String homeAdress;
+    private String homeAddress;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude

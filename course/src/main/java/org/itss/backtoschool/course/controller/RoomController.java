@@ -9,13 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 public interface RoomController {
-
-    @GetMapping
     ResponseEntity<List<RoomDTO>> getAllRooms();
-    
-    @GetMapping("/floor/{floorId}")
-    ResponseEntity<List<RoomDTO>> getRoomsByFloorId(@PathVariable Long floorId);
-    
-    @GetMapping("/building/{buildingId}")
-    ResponseEntity<List<RoomDTO>> getRoomsByBuildingId(@PathVariable Long buildingId);
+    ResponseEntity<List<RoomDTO>> getRoomsByFloorId(Long floorId);
+    ResponseEntity<List<RoomDTO>> getRoomsByBuildingId(Long buildingId);
 }

@@ -53,7 +53,7 @@ public class SeatServiceImpl implements SeatService {
         if (roomId != null) {
             seats = seatRepository.findByRoomId(roomId);
         } else if (floorId != null) {
-            var rooms = roomRepository.findByFloorId(floorId);
+            var rooms = roomRepository.findByfloorId(floorId);
             seats = rooms.stream()
                     .flatMap(room -> room.getSeats().stream())
                     .toList();

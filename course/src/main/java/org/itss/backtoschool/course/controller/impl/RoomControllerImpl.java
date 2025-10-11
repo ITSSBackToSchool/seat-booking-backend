@@ -33,18 +33,4 @@ public class RoomControllerImpl implements RoomController {
     public ResponseEntity<List<RoomDTO>> getRoomsByBuildingId(@PathVariable Long buildingId) {
         return ResponseEntity.ok(roomService.getRoomsByBuildingId(buildingId));
     }
-    
-    @Override
-    public ResponseEntity<List<RoomDTO>> getRoomsByFloorId(Long floorId) {
-        List<Room> rooms = roomRepository.findByFloorId(floorId);
-        List<RoomDTO> roomDTOs = roomMapper.toDTOList(rooms);
-        return ResponseEntity.ok(roomDTOs);
-    }
-    
-    @Override
-    public ResponseEntity<List<RoomDTO>> getRoomsByBuildingId(Long buildingId) {
-        List<Room> rooms = roomRepository.findByFloor_BuildingId(buildingId);
-        List<RoomDTO> roomDTOs = roomMapper.toDTOList(rooms);
-        return ResponseEntity.ok(roomDTOs);
-    }
 }

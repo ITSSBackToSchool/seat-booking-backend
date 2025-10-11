@@ -7,14 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class UserDTO {
+public class FloorDTO {
     private Long id;
-    private String userName;
-    private String password;
-    private String email;
-    private String phone;
-    private String homeAddress;
-
-
+    private String name;
+    private Long buildingId;
+    private String buildingName;
 }
+

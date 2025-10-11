@@ -9,19 +9,18 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationRoomDTO {
+@Builder
+public class UserReservationDTO {
     private Long id;
-    private LocalDate reservationDate;
-    private String status;
+    private String seatNumber;
     private String roomName;
     private String floorName;
     private String buildingName;
-    private Long userId;
-    private String userName;
-    private String userEmail;
+    private LocalDate reservationDate;
     private LocalTime startTime;
     private LocalTime endTime;
+    private String status;
 }
+

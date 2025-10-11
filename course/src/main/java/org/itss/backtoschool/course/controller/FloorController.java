@@ -1,21 +1,25 @@
 package org.itss.backtoschool.course.controller;
 
+import org.itss.backtoschool.course.dto.FloorDTO;
 import org.itss.backtoschool.course.dto.RoomDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-public interface RoomController {
-
-    @GetMapping
-    ResponseEntity<List<RoomDTO>> getAllRooms();
+public interface FloorController {
     
-    @GetMapping("/floor/{floorId}")
+    @GetMapping
+    ResponseEntity<List<FloorDTO>> getAllFloors();
+    
+    @GetMapping("/{id}")
+    ResponseEntity<FloorDTO> getFloorById(@PathVariable Long id);
+    
+    @GetMapping("/{floorId}/rooms")
     ResponseEntity<List<RoomDTO>> getRoomsByFloorId(@PathVariable Long floorId);
     
     @GetMapping("/building/{buildingId}")
-    ResponseEntity<List<RoomDTO>> getRoomsByBuildingId(@PathVariable Long buildingId);
+    ResponseEntity<List<FloorDTO>> getFloorsByBuildingId(@PathVariable Long buildingId);
 }
+

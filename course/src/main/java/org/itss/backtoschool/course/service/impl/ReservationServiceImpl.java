@@ -3,6 +3,7 @@ package org.itss.backtoschool.course.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.ReservationRoomDTO;
 import org.itss.backtoschool.course.dto.ReservationSeatDTO;
+import org.itss.backtoschool.course.dto.UserReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationSeatRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
@@ -34,8 +35,6 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationSeatMapper reservationSeatMapper;
     private final ReservationRoomMapper reservationRoomMapper;
 
-
-
     @Override
     @Transactional
     public CreateReservationSeatResponse createReservationsForSeats(CreateReservationSeatRequest request) {
@@ -46,7 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
         LocalTime startTime = request.getStartTime() != null ? request.getStartTime() : LocalTime.of(9, 0);
         LocalTime endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusHours(1);
 
-        for (Long seatId : request.getSeatIds()) {
+        for (Long seatId : request.getSeatId()) {
             createdReservations.add(createReservationForSeat(seatId, user, date, startTime, endTime));
         }
 
@@ -58,31 +57,6 @@ public class ReservationServiceImpl implements ReservationService {
                 .reservations(dtos)
                 .build();
     }
-
-
-    private Reservation createReservationForSeat(Long seatId, User user,
-                                                 LocalDate date, LocalTime startTime, LocalTime endTime) {
-        Seat seat = seatRepository.findById(seatId)
-                .orElseThrow(() -> new RuntimeException("Seat not found with id=" + seatId));
-
-        if (reservationRepository.existsBySeat_IdAndReservationDateAndStartTimeAndStatus(
-                seatId, date, startTime, ReservationStatus.ACTIVE)) {
-            throw new RuntimeException("Seat " + seatId + " already reserved for " + date + " at " + startTime);
-        }
-
-        return reservationRepository.save(
-                Reservation.builder()
-                        .reservationDate(date)
-                        .startTime(startTime)
-                        .endTime(endTime)
-                        .status(ReservationStatus.ACTIVE)
-                        .seat(seat)
-                        .room(seat.getRoom())
-                        .users(user)
-                        .build()
-        );
-    }
-
 
     @Override
     @Transactional
@@ -107,13 +81,61 @@ public class ReservationServiceImpl implements ReservationService {
                 .build();
     }
 
-    private Reservation createReservationForRoom(Long roomId, User user,
-                                                 LocalDate date, LocalTime startTime, LocalTime endTime) {
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationSeatDTO> getAllSeatReservations() {
+        return reservationRepository.findAll().stream()
+                .filter(r -> r.getSeat() != null)
+                .map(reservationSeatMapper::toDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationRoomDTO> getAllRoomReservations() {
+        return reservationRepository.findAllRoomReservationsWithDetails().stream()
+                .map(r -> ReservationRoomDTO.builder()
+                        .id(r.getId())
+                        .reservationDate(r.getReservationDate())
+                        .status(r.getStatus().name())
+                        .roomName(r.getRoom().getName())
+                        .floorName(r.getRoom().getFloor().getName())
+                        .buildingName(r.getRoom().getFloor().getBuilding().getName())
+                        .userId(r.getUsers().getId())
+                        .userName(r.getUsers().getUserName())
+                        .userEmail(r.getUsers().getEmail())
+                        .startTime(r.getStartTime())
+                        .endTime(r.getEndTime())
+                        .build())
+                .toList();
+    }
+
+    private Reservation createReservationForSeat(Long seatId, User user, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() -> new RuntimeException("Seat not found with id=" + seatId));
+
+        if (reservationRepository.existsBySeat_IdAndReservationDateAndStartTimeAndStatus(seatId, date, startTime, ReservationStatus.ACTIVE)) {
+            throw new RuntimeException("Seat " + seatId + " already reserved for " + date + " at " + startTime);
+        }
+
+        return reservationRepository.save(
+                Reservation.builder()
+                        .reservationDate(date)
+                        .startTime(startTime)
+                        .endTime(endTime)
+                        .status(ReservationStatus.ACTIVE)
+                        .seat(seat)
+                        .room(seat.getRoom())
+                        .users(user)
+                        .build()
+        );
+    }
+
+    private Reservation createReservationForRoom(Long roomId, User user, LocalDate date, LocalTime startTime, LocalTime endTime) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found with id=" + roomId));
 
-        if (reservationRepository.existsByRoom_IdAndReservationDateAndStartTimeAndStatus(
-                roomId, date, startTime, ReservationStatus.ACTIVE)) {
+        if (reservationRepository.existsByRoom_IdAndReservationDateAndStartTimeAndStatus(roomId, date, startTime, ReservationStatus.ACTIVE)) {
             throw new RuntimeException("Room " + roomId + " already reserved for " + date + " at " + startTime);
         }
 
@@ -129,7 +151,34 @@ public class ReservationServiceImpl implements ReservationService {
         );
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserReservationDTO> getUserReservations(Long userId) {
+        List<Reservation> reservations = reservationRepository.findByUsersIdOrderByReservationDateDesc(userId);
+        return reservations.stream()
+                .filter(r -> r.getSeat() != null)
+                .map(r -> UserReservationDTO.builder()
+                        .id(r.getId())
+                        .seatNumber(r.getSeat().getSeatNumber())
+                        .roomName(r.getRoom().getName())
+                        .floorName(r.getRoom().getFloor().getName())
+                        .buildingName(r.getRoom().getFloor().getBuilding().getName())
+                        .reservationDate(r.getReservationDate())
+                        .startTime(r.getStartTime())
+                        .endTime(r.getEndTime())
+                        .status(r.getStatus().name())
+                        .build())
+                .toList();
+    }
 
+    @Override
+    @Transactional
+    public void cancelReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(reservation);
+    }
 
     private User loadUser(Long userId) {
         return userRepository.findById(userId)

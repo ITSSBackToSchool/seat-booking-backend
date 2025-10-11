@@ -29,7 +29,7 @@ public class Reservation extends CommonEntity {
     private ReservationStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_id", nullable = false)
+    @JoinColumn(name = "seat_id")
     @ToString.Exclude
     private Seat seat;
 

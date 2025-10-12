@@ -155,7 +155,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private boolean isRoomAlreadyReserved(Long roomId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd){
-        return reservationRepository.existsByRoomIdAndReservationDateStartAndReservationDateEndAndStatus(roomId,reservationDateStart,reservationDateEnd,ReservationStatus.ACTIVE);
+        return reservationRepository.existsByRoomIdAndStatusAndReservationDateStartLessThanAndReservationDateEndGreaterThan(roomId,ReservationStatus.ACTIVE,reservationDateEnd,reservationDateStart);
     }
 
     private void validateRoomAvailability(Room room,LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd){

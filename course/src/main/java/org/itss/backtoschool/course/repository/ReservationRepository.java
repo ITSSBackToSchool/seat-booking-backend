@@ -16,7 +16,13 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     boolean existsBySeatIdAndReservationDateStartAndReservationDateEndAndStatus(Long seatId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd, ReservationStatus reservationStatus);
     List<Reservation> findReservationsByUserId(Long userId);
-    boolean existsByRoomIdAndReservationDateStartAndReservationDateEndAndStatus(Long roomId, LocalDateTime reservationDateStart, LocalDateTime reservationDateEnd, ReservationStatus reservationStatus);
+    boolean existsByRoomIdAndStatusAndReservationDateStartLessThanAndReservationDateEndGreaterThan(
+            Long roomId,
+            ReservationStatus status,
+            LocalDateTime reservationDateEnd,
+            LocalDateTime reservationDateStart
+    );
+
     List<Reservation> findByRoom_IdAndStatusAndReservationDateStartLessThanAndReservationDateEndGreaterThan(
             Long roomId,  ReservationStatus status, LocalDateTime dateStart, LocalDateTime dateEnd
     );

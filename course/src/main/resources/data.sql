@@ -20,27 +20,20 @@ INSERT INTO floor (id, name, building_id) VALUES (6, 'Etaj 2', 2);
 -- =========================
 -- ROOMS (săli de ședință / evenimente)
 -- =========================
---- Clădire T1
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (1, 'Evenimente', 25, 2);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (2, 'Side-evenimente 1', 5, 2);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (3, 'Stand-up Chat room', 15, 2);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (4, 'La terasa', 10, 2);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (5, 'Tenis', 5, 3);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (6, 'Gaming', 11, 3);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (7, 'Outland', 10, 3);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (8, '404', 10, 2);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (9, 'Lounge', 8, 1);
+-- Clădire T1 ----
+-- T1
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (1, 'Lounge', 8, 1);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (2, 'Evenimente', 25, 2);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (3, 'Side-evenimente 1', 5, 2);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (4, 'Stand-up Chat room', 15, 2);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (5, 'La terasa', 10, 2);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (6, 'Tenis', 5, 3);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (7, 'Gaming', 11, 3);
 
--- Clădire T2
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (10, 'Evenimente', 25, 5);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (11, 'Side-evenimente 1', 5, 5);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (12, 'Stand-up Chat room', 15, 5);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (13, 'La terasa', 10, 5);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (14, 'Tenis', 5, 6);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (15, 'Gaming', 11, 6);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (16, 'Outland', 10, 6);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (17, '404', 10, 5);
-INSERT INTO room (id, name, seat_count, floor_id) VALUES (18, 'Lounge', 8, 4);
+-- T2
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (8, '404', 10, 5);
+INSERT INTO room (id, name, seat_count, floor_id) VALUES (9, 'Outland', 10, 6);
+
 
 -- =========================
 -- SEATS (scaune individuale, doar pe etaje)

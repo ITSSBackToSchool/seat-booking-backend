@@ -9,6 +9,7 @@ import org.itss.backtoschool.course.service.SeatService;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/seats")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class SeatControllerImpl implements SeatController {
 
     private final SeatService seatService;

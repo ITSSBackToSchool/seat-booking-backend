@@ -14,7 +14,7 @@ public interface ReservationService {
 
     CreateReservationSeatResponse createReservationsForSeats(CreateReservationSeatRequest request);
 
-    CreateReservationRoomResponse createReservationsForRooms(CreateReservationRoomRequest request);
+    CreateReservationRoomResponse createReservationForRoom(CreateReservationRoomRequest request);
 
     List<ReservationSeatDTO> getAllSeatReservations();
 

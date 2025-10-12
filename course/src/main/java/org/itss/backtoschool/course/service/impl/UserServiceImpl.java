@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO register(UserDTO userDTO) {
         User user = userMapper.toEntity(userDTO);
+        user.setRole("EMPLOYEE");
+        user.setUserName(user.getUserName());  // hereee
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user = userRepository.save(user);
         return userMapper.toDTO(user);

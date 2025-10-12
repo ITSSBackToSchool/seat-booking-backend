@@ -18,6 +18,7 @@ import org.itss.backtoschool.course.dto.ReservationRoomDTO;
 @RestController
 @RequestMapping("/api/reservations")
 @RequiredArgsConstructor
+
 public class ReservationControllerImpl implements ReservationController {
 
     private final ReservationService reservationService;
@@ -27,7 +28,7 @@ public class ReservationControllerImpl implements ReservationController {
             @RequestBody CreateReservationRoomRequest request) {
 
         try {
-            CreateReservationRoomResponse response = reservationService.createReservationsForRooms(request);
+            CreateReservationRoomResponse response = reservationService.createReservationForRoom(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity

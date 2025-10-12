@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateReservationRoomRequest {
     private Long userId;
-    private List<Long> roomIds;
+    private Long roomIds;
     private LocalDate reservationDate;
     private LocalTime startTime;
     private LocalTime endTime;

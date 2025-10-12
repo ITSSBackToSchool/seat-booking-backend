@@ -27,6 +27,9 @@ public class User extends CommonEntity {
     @Column
     private String phone;
 
+    @Column
+    private String role;
+
     @Column(name = "home_adress")
     private String homeAddress;
 

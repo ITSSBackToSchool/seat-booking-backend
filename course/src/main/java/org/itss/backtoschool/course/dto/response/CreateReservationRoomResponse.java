@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CreateReservationRoomResponse {
-    private List<ReservationRoomDTO> reservations;
+    private ReservationRoomDTO reservation;
 }

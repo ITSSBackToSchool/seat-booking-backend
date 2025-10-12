@@ -32,19 +32,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // login/register endpoints
-                        .anyRequest().authenticated()                 // protect all other endpoints
+                        .requestMatchers("/api/auth/**").permitAll() // login/register
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // allow preflight
+                        .anyRequest().authenticated() // rest endpoints require auth
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // stateless JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
-        // Add your JWT filter BEFORE Spring Security's authentication filter
+        // Add JWT filter
         http.addFilterBefore(jwtAuthenticationFilter,
                 org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
+        // Enable CORS
+        http.cors(); // must have a CorsConfigurationSource bean or WebMvcConfigurer with allowed origins
+
         return http.build();
     }
+
 }

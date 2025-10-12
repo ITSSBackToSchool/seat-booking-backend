@@ -60,26 +60,30 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public CreateReservationRoomResponse createReservationsForRooms(CreateReservationRoomRequest request) {
+    public CreateReservationRoomResponse createReservationForRoom(CreateReservationRoomRequest request) {
         User user = loadUser(request.getUserId());
 
-        List<Reservation> createdReservations = new ArrayList<>();
         LocalDate date = request.getReservationDate();
         LocalTime startTime = request.getStartTime() != null ? request.getStartTime() : LocalTime.of(9, 0);
         LocalTime endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusHours(1);
 
-        for (Long roomId : request.getRoomIds()) {
-            createdReservations.add(createReservationForRoom(roomId, user, date, startTime, endTime));
+        Long roomId = request.getRoomIds();
+        if (roomId == null) {
+            throw new IllegalArgumentException("Room ID must be provided for reservation");
         }
 
-        List<ReservationRoomDTO> dtos = createdReservations.stream()
-                .map(reservationRoomMapper::toDTO)
-                .toList();
+        // ✅ Creează o singură rezervare pentru o singură cameră
+        Reservation reservation = createReservationForRoom(roomId, user, date, startTime, endTime);
 
+        // ✅ Mapare către DTO
+        ReservationRoomDTO dto = reservationRoomMapper.toDTO(reservation);
+
+        // ✅ Returnează direct obiectul DTO (nu listă)
         return CreateReservationRoomResponse.builder()
-                .reservations(dtos)
+                .reservation(dto)
                 .build();
     }
+
 
     @Override
     @Transactional(readOnly = true)

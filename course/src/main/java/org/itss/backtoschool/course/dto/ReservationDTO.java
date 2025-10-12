@@ -5,15 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReservationDTO {
     private Long id;
-    private LocalDate reservationDate;
+    private LocalDateTime reservationDateStart;
+    private LocalDateTime reservationDateEnd;
     private String status;
     private Long seatId;
+    private Long roomId;
     private String seatNumber;
     private String roomName;
     private String floorName;

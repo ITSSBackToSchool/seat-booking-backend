@@ -1,33 +1,28 @@
 package org.itss.backtoschool.course.controller.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.itss.backtoschool.course.controller.TrafficController;
-import org.itss.backtoschool.course.dto.request.TrafficRouteRequest;
-import org.itss.backtoschool.course.dto.response.TrafficRouteResponse;
+import org.itss.backtoschool.course.dto.response.TrafficIncident;
+import org.itss.backtoschool.course.dto.response.TrafficRouteOption;
 import org.itss.backtoschool.course.service.TrafficService;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
-@RequestMapping("/api/traffic")
+@RequestMapping("/traffic")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class TrafficControllerImpl implements TrafficController {
+	private final TrafficService trafficService;
 
-    private final TrafficService trafficService;
+	@Override
+	public TrafficRouteOption getDirections(String start, boolean traffic, String travelMode) {
+		return trafficService.getDirections(start,traffic,travelMode);
+	}
 
-    @Override
-    public ResponseEntity<TrafficRouteResponse> getRouteToHeadquarters(TrafficRouteRequest request) {
-        log.info("Received request for route to headquarters from: {}", request.getOriginAddress());
-
-        TrafficRouteResponse response = trafficService.getRoutesToHeadquarters(request);
-
-        log.info("Returning {} routes and {} traffic incidents",
-                response.getRoutes().size(),
-                response.getTrafficIncidents().size());
-
-        return ResponseEntity.ok(response);
-    }
+	@Override
+	public TrafficIncident getTrafficIncidents(String startBbox) {
+		return trafficService.getTrafficIncidents(startBbox);
+	}
 }

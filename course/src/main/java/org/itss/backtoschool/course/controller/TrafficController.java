@@ -1,13 +1,16 @@
 package org.itss.backtoschool.course.controller;
 
-import org.itss.backtoschool.course.dto.request.TrafficRouteRequest;
-import org.itss.backtoschool.course.dto.response.TrafficRouteResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.itss.backtoschool.course.dto.response.TrafficIncident;
+import org.itss.backtoschool.course.dto.response.TrafficRouteOption;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface TrafficController {
 
-    @PostMapping("/route-to-headquarters")
-    ResponseEntity<TrafficRouteResponse> getRouteToHeadquarters(@RequestBody TrafficRouteRequest request);
+	@GetMapping("/directions")
+	TrafficRouteOption getDirections(@RequestParam String start, @RequestParam boolean traffic, String travelMode);
+
+	@GetMapping("/incidents")
+	TrafficIncident getTrafficIncidents(String startBbox);
+
 }

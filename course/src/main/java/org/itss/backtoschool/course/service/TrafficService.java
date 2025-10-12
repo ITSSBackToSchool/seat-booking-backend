@@ -1,8 +1,9 @@
 package org.itss.backtoschool.course.service;
 
-import org.itss.backtoschool.course.dto.request.TrafficRouteRequest;
-import org.itss.backtoschool.course.dto.response.TrafficRouteResponse;
+import org.itss.backtoschool.course.dto.response.TrafficIncident;
+import org.itss.backtoschool.course.dto.response.TrafficRouteOption;
 
 public interface TrafficService {
-    TrafficRouteResponse getRoutesToHeadquarters(TrafficRouteRequest request);
+	TrafficRouteOption getDirections(String start, boolean traffic, String travelMode);
+	TrafficIncident getTrafficIncidents(String startBbox);
 }

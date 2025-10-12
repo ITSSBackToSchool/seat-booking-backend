@@ -17,9 +17,9 @@ public class Seat extends CommonEntity{
     private String seatNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id",  nullable = false)
+    @JoinColumn(name = "floor_id",  nullable = false)
     @ToString.Exclude
-    private Room room;
+    private Floor floor;
 
     @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude

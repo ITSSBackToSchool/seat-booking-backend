@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SeatDTO {
-    private Long id;
-    private String seatNumber;
-    private String floorName;
-    private String buildingName;
-    private boolean isOccupied = false;
+public class RoomDTO {
+	private Long roomId;
+	private Integer seatCount;
+	private String name;
+	private String buildingName;
+	private String floorName;
 }

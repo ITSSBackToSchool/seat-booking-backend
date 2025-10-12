@@ -1,8 +1,8 @@
 spring:
   application:
-    name: course
+    name: course_db
   datasource:
-    url: jdbc:mysql://localhost:3307/seat_booking_db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3307/course_db?createDatabaseIfNotExist=true
     username: user
     password: user1234
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,7 +12,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
     defer-datasource-initialization: true
   sql:
@@ -21,16 +21,5 @@ spring:
       data-locations: classpath:data.sql
 
 server:
-  port: 8090
+  port: 8080
 
-azure:
-  maps:
-    subscription-key: ${AZURE_MAPS_KEY:your-azure-maps-subscription-key-here}
-    base-url: https://atlas.microsoft.com
-    api-version: 2024-04-01
-
-company:
-  headquarters:
-    latitude: 35.6762
-    longitude: 139.6503
-    address: "Bucharest, Romania"

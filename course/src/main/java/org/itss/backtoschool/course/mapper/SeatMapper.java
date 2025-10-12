@@ -10,10 +10,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SeatMapper {
 
-    @Mapping(source = "room.name", target = "roomName")
-    @Mapping(source = "room.floor.name", target = "floorName")
-    @Mapping(source = "room.floor.building.name", target = "buildingName")
-    SeatDTO toDTO(Seat seat);
+	@Mapping(source = "floor.name", target = "floorName")
+	@Mapping(source = "floor.building.name", target = "buildingName")
+	SeatDTO toDTO(Seat seat);
 
-    List<SeatDTO> toDTOList(List<Seat> seats);
+	List<SeatDTO> toDTOList(List<Seat> seats);
 }
+

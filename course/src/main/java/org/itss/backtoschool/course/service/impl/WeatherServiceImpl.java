@@ -12,7 +12,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public WeatherResponse getCurrentWeather() {
-        return restTemplate.getForObject("https://api.open-meteo.com/v1/forecast?latitude=44.4323&longitude=26.1063&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m&timezone=auto"
+        return restTemplate.getForObject("https://api.open-meteo.com/v1/forecast?latitude=44.4323&longitude=26.1063&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure&timezone=auto"
                 ,WeatherResponse.class);
     }
 }

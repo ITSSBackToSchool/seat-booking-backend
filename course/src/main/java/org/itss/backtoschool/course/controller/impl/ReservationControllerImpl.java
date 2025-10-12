@@ -7,6 +7,7 @@ import org.itss.backtoschool.course.dto.request.CreateReservationRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationResponse;
 import org.itss.backtoschool.course.dto.response.TimeSlot;
+import org.itss.backtoschool.course.entities.ReservationStatus;
 import org.itss.backtoschool.course.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,11 @@ public class ReservationControllerImpl implements ReservationController {
     public ResponseEntity<ReservationDTO> createRoomReservation(CreateReservationRoomRequest request) {
         ReservationDTO response = reservationService.createRoomReservation(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    public List<ReservationDTO> findUserReservationsByStatus(Long userId, ReservationStatus status) {
+        return reservationService.findReservationsByUserIdAndStatus(userId,status);
     }
 
 

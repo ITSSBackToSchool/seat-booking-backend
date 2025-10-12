@@ -106,6 +106,12 @@ public class ReservationServiceImpl implements ReservationService {
         return createdReservationDTO;
     }
 
+    @Override
+    public List<ReservationDTO> findReservationsByUserIdAndStatus(Long userId, ReservationStatus status) {
+        return reservationRepository.findReservationsByUser_IdAndStatus(userId,status)
+                .stream()
+                .map(reservationMapper::toDTO).toList();
+    }
 
 
     private User loadUser(Long userId) {

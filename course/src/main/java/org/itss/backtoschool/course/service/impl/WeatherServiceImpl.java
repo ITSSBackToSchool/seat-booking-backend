@@ -8,11 +8,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class WeatherServiceImpl implements WeatherService {
-	private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
 
-	@Override
-	public WeatherResponse getCurrentWeather() {
-		return restTemplate.getForObject("https://api.open-meteo.com/v1/forecast?latitude=44.4323&longitude=26.1063&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure&forecast_days=1"
-				,WeatherResponse.class);
-	}
+    @Override
+    public WeatherResponse getCurrentWeather() {
+        return restTemplate.getForObject("https://api.open-meteo.com/v1/forecast?latitude=44.4323&longitude=26.1063&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure&timezone=auto"
+                ,WeatherResponse.class);
+    }
 }

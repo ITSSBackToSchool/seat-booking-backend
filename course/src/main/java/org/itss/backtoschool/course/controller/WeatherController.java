@@ -4,6 +4,6 @@ import org.itss.backtoschool.course.dto.response.WeatherResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 public interface WeatherController {
 
-	@GetMapping
-	public WeatherResponse getCurrentWeather();
+    @GetMapping
+    public WeatherResponse getCurrentWeather();
 }

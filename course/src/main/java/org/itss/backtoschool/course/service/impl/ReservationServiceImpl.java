@@ -80,7 +80,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public String completeReservations() {
         List<Reservation> reservations = reservationRepository.findAll();
 

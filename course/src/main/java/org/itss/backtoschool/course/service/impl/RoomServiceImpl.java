@@ -34,7 +34,7 @@ public class RoomServiceImpl implements RoomService {
 		List<List<TimeSlot>> bookedSlots = reservationDTOS.stream().map(this::splitHoursIntoIntervals).toList();
 		List<TimeSlot> allTimeSlots = new ArrayList<>();
 
-		for (int hour = 0; hour < 24; hour++) {
+		for (int hour = 9; hour < 20; hour++) {
 			LocalDateTime start = LocalDateTime.of(dateStart.toLocalDate(), LocalTime.of(hour,0));
 			LocalDateTime end = start.plusHours(1);
 			allTimeSlots.add(new TimeSlot(start, end, true));

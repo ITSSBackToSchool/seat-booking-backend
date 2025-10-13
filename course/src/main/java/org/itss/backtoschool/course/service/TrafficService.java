@@ -7,31 +7,40 @@ import org.itss.backtoschool.course.dto.response.TrafficResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Service
 @RequiredArgsConstructor
 public class TrafficService {
 
-    private static final String API_KEY = "";
+    private static final String API_KEY = "AIzaSyCkoMpJxoH8tiZiKdLFqzLSFaxkL4f9Ifs";
 
     public TrafficResponse getTrafficInfo(String origin, String destination) throws Exception {
+        // Encode addresses or coordinates
+        String encodedOrigin = URLEncoder.encode(origin, StandardCharsets.UTF_8.toString());
+        String encodedDestination = URLEncoder.encode(destination, StandardCharsets.UTF_8.toString());
+
         String url = String.format(
                 "https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&departure_time=now&traffic_model=best_guess&key=%s",
-                origin, destination, API_KEY
+                encodedOrigin, encodedDestination, API_KEY
         );
 
         RestTemplate restTemplate = new RestTemplate();
         String responseBody = restTemplate.getForObject(url, String.class);
 
+        // Log Google API response for debugging
+        System.out.println("Google API response: " + responseBody);
+
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(responseBody);
 
         if (!root.path("status").asText().equals("OK")) {
-            throw new RuntimeException("Eroare Google API: " + root.path("status").asText() +
-                    " | Mesaj: " + root.path("error_message").asText(""));
+            throw new RuntimeException("Google API error: " + root.path("status").asText() +
+                    " | Message: " + root.path("error_message").asText(""));
         }
 
         JsonNode leg = root.path("routes").get(0).path("legs").get(0);
-
 
         double distanceKm = leg.path("distance").path("value").asDouble() / 1000.0;
         double normalDurationMin = leg.path("duration").path("value").asDouble() / 60.0;
@@ -53,7 +62,6 @@ public class TrafficService {
         } else {
             trafficLevel = "HEAVY";
         }
-
 
         return TrafficResponse.builder()
                 .start(startAddress)

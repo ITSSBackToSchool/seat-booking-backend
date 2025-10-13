@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class WeatherService {
 
-    private static final String API_KEY = "";
+    private static final String API_KEY = "7SEB4G8FFJHHD9SK7B5MMWV8M"; // currently empty
 
     public String getWeatherForDate(String city, String date) throws Exception {
         String url = String.format(
@@ -22,7 +22,6 @@ public class WeatherService {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(responseBody);
 
-
         JsonNode day = root.path("days").get(0);
 
         String conditions = day.path("conditions").asText();
@@ -34,4 +33,5 @@ public class WeatherService {
                 city, date, tempMax, tempMin, conditions
         );
     }
+
 }

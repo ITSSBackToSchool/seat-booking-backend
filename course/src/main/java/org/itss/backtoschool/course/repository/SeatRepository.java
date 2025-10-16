@@ -19,6 +19,7 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
     AND s.id NOT IN (
         SELECT r.seat.id FROM Reservation r
         WHERE r.status = 'ACTIVE'
+        AND r.seat IS NOT NULL
         AND (
             (:dateStart >= r.reservationDateStart AND :dateStart <= r.reservationDateEnd)
             OR (:dateEnd >= r.reservationDateStart AND :dateEnd <= r.reservationDateEnd)

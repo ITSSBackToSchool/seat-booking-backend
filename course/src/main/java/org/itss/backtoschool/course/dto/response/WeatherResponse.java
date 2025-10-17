@@ -29,6 +29,8 @@ public class WeatherResponse {
         private int relative_humidity_2m;
         private double precipitation;
         private double surface_pressure;
+        private double wind_speed_10m;
+        private double wind_direction_10m;
     }
 
     @Getter
@@ -38,5 +40,7 @@ public class WeatherResponse {
         private List<Double> temperature_2m_max;
         private List<Double> temperature_2m_min;
         private List<Double> precipitation_sum;
+        private List<Double> wind_speed_10m_max;
+        private List<Double> wind_direction_10m_dominant;
     }
 }

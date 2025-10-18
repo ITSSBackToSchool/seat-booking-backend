@@ -55,4 +55,35 @@ public class SeatServiceImpl implements SeatService {
 
         return seatMapper.toDTO(saved);
     }
+
+    @Override
+    public void deleteSeat(Long seatId) {
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() -> new IllegalArgumentException("Seat not found: " + seatId));
+
+        // Cascade delete will handle associated reservations due to CascadeType.ALL
+        seatRepository.delete(seat);
+    }
+
+    @Override
+    public SeatDTO updateSeat(Long seatId, String seatNumber, Long roomId) {
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() -> new IllegalArgumentException("Seat not found: " + seatId));
+
+        // Update seat number if provided
+        if (seatNumber != null && !seatNumber.trim().isEmpty()) {
+            seat.setSeatNumber(seatNumber);
+        }
+
+        // Update room if provided
+        if (roomId != null) {
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
+            seat.setRoom(room);
+        }
+
+        Seat updated = seatRepository.save(seat);
+
+        return seatMapper.toDTO(updated);
+    }
 }

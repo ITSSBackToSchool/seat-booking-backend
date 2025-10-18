@@ -7,15 +7,14 @@ import org.itss.backtoschool.deskops.config.security.CurrentUser;
 import org.itss.backtoschool.deskops.controller.SeatController;
 import org.itss.backtoschool.deskops.dto.CreateSeatRequest;
 import org.itss.backtoschool.deskops.dto.SeatDTO;
+import org.itss.backtoschool.deskops.dto.UpdateSeatRequest;
 import org.itss.backtoschool.deskops.entities.User;
 import org.itss.backtoschool.deskops.service.SeatService;
 import org.itss.backtoschool.deskops.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
@@ -53,6 +52,26 @@ public class SeatControllerImpl implements SeatController {
                  user.getName(), user.getId(), request.getSeatNumber(), request.getRoomId());
         var created = seatService.createSeat(request.getSeatNumber(), request.getRoomId());
         return ResponseEntity.status(201).body(created);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('DELETE_SEAT')")
+    public ResponseEntity<Void> deleteSeat(@CurrentUser Jwt jwt, Long seatId) {
+        User user = userService.getOrCreateUser(jwt);
+        log.info("User '{}' (id: {}) deleting seat with ID: {}", user.getName(), user.getId(), seatId);
+
+        seatService.deleteSeat(seatId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('UPDATE_SEAT')")
+    public ResponseEntity<SeatDTO> updateSeat(@CurrentUser Jwt jwt, Long seatId, @Valid UpdateSeatRequest request) {
+        User user = userService.getOrCreateUser(jwt);
+        log.info("User '{}' (id: {}) updating seat with ID: {}", user.getName(), user.getId(), seatId);
+
+        SeatDTO updated = seatService.updateSeat(seatId, request.getSeatNumber(), request.getRoomId());
+        return ResponseEntity.ok(updated);
     }
 
 }

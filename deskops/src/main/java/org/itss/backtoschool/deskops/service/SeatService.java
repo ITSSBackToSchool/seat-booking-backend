@@ -9,4 +9,6 @@ public interface SeatService {
     List<SeatDTO> getAllSeats();
     List<SeatDTO> getAvailableSeats(LocalDate date, Long buildingId);
     SeatDTO createSeat(String seatNumber, Long roomId);
+    void deleteSeat(Long seatId);
+    SeatDTO updateSeat(Long seatId, String seatNumber, Long roomId);
 }

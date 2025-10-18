@@ -18,4 +18,12 @@ public interface RoomService {
      * @return complete timeline with booked and available slots
      */
     RoomAvailabilityResponse getRoomAvailability(Long roomId, LocalDate date);
+
+    /**
+     * Delete a room by ID.
+     * This will also delete all associated seats and reservations.
+     *
+     * @param roomId the room ID to delete
+     */
+    void deleteRoom(Long roomId);
 }

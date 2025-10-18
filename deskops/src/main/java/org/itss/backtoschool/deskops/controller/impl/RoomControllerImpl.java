@@ -57,4 +57,23 @@ public class RoomControllerImpl {
         RoomAvailabilityResponse availability = roomService.getRoomAvailability(roomId, date);
         return ResponseEntity.ok(availability);
     }
+
+    /**
+     * Delete a room by ID.
+     * This will also delete all associated seats and reservations.
+     * Example: DELETE /api/rooms/4
+     *
+     * @param jwt the authenticated user's JWT token
+     * @param roomId the room ID to delete
+     * @return 204 No Content on success
+     */
+    @DeleteMapping("/{roomId}")
+    @PreAuthorize("hasAuthority('MANAGE_ROOMS')")
+    public ResponseEntity<Void> deleteRoom(@CurrentUser Jwt jwt, @PathVariable Long roomId) {
+        User user = userService.getOrCreateUser(jwt);
+        log.info("User '{}' (id: {}) deleting room with ID: {}", user.getName(), user.getId(), roomId);
+
+        roomService.deleteRoom(roomId);
+        return ResponseEntity.noContent().build();
+    }
 }

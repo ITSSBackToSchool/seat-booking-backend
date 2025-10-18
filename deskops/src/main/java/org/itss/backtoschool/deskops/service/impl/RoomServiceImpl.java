@@ -173,4 +173,17 @@ public class RoomServiceImpl implements RoomService {
                 .mapToInt(TimeSlotDTO::getDurationMinutes)
                 .sum();
     }
+
+    @Override
+    public void deleteRoom(Long roomId) {
+        log.info("Deleting room with ID: {}", roomId);
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
+
+        // Cascade delete will handle seats and reservations due to CascadeType.ALL
+        roomRepository.delete(room);
+
+        log.info("Successfully deleted room with ID: {} and all associated seats/reservations", roomId);
+    }
 }

@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -210,10 +211,23 @@ public class ReservationServiceImpl implements ReservationService {
             throw new InvalidReservationDateException("Reservation date cannot be in the past");
         }
 
+        DayOfWeek dayOfWeek = reservationDate.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            throw new InvalidReservationDateException("Reservations cannot be made on weekends");
+        }
 
-        LocalDate maxDate = today.plusDays(5);
+        LocalDate maxDate = today;
+        int businessDays = 0;
+        while (businessDays < 5) {
+            maxDate = maxDate.plusDays(1);
+            DayOfWeek dow = maxDate.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
+                businessDays++;
+            }
+        }
+
         if (reservationDate.isAfter(maxDate)) {
-            throw new InvalidReservationDateException("Reservations can only be made up to 5 days in advance");
+            throw new InvalidReservationDateException("Reservations can only be made up to 5 business days in advance");
         }
     }
 

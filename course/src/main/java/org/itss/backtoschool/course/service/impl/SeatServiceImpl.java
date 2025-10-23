@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.SeatAvailabilityDTO;
 import org.itss.backtoschool.course.dto.SeatDTO;
 import org.itss.backtoschool.course.entities.Reservation;
+import org.itss.backtoschool.course.entities.Room;
+import org.itss.backtoschool.course.entities.RoomType;
 import org.itss.backtoschool.course.entities.Seat;
 import org.itss.backtoschool.course.mapper.SeatMapper;
 import org.itss.backtoschool.course.repository.ReservationRepository;
@@ -47,25 +49,27 @@ public class SeatServiceImpl implements SeatService {
             LocalTime startTime,
             LocalTime endTime
     ) {
-        // Get seats based on filters
+
         List<Seat> seats;
 
         if (roomId != null) {
             seats = seatRepository.findByRoomId(roomId);
         } else if (floorId != null) {
-            var rooms = roomRepository.findByfloorId(floorId);
+            var rooms = roomRepository.findByFloorId(floorId);
+
             seats = rooms.stream()
+                    .filter(room -> room.getRoomType() == RoomType.DESK_ROOM)
                     .flatMap(room -> room.getSeats().stream())
                     .toList();
         } else {
             seats = seatRepository.findAll();
         }
 
-        // For each seat, check availability
+
         List<SeatAvailabilityDTO> result = new ArrayList<>();
 
         for (Seat seat : seats) {
-            // Find overlapping reservations
+
             List<Reservation> overlapping = reservationRepository.findOverlappingSeatReservations(
                     seat.getId(),
                     date,
@@ -82,7 +86,7 @@ public class SeatServiceImpl implements SeatService {
                     .isAvailable(overlapping.isEmpty())
                     .build();
 
-            // If not available, add reservation info
+
             if (!overlapping.isEmpty()) {
                 Reservation reservation = overlapping.get(0);
                 dto.setReservedBy(reservation.getUsers().getUserName());

@@ -5,6 +5,7 @@ import org.itss.backtoschool.course.controller.ReservationController;
 import org.itss.backtoschool.course.dto.UserReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationSeatRequest;
+import org.itss.backtoschool.course.dto.request.UpdateReservationRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
 import org.itss.backtoschool.course.dto.response.CreateReservationSeatResponse;
 import org.itss.backtoschool.course.service.ReservationService;
@@ -62,7 +63,7 @@ public class ReservationControllerImpl implements ReservationController {
         return ResponseEntity.ok(reservations);
     }
 
-    // GET all room reservations
+
     @GetMapping("/rooms")
     public ResponseEntity<List<ReservationRoomDTO>> getAllRoomReservations() {
         List<ReservationRoomDTO> reservations = reservationService.getAllRoomReservations();
@@ -73,6 +74,19 @@ public class ReservationControllerImpl implements ReservationController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<UserReservationDTO>> getUserReservations(@PathVariable Long userId) {
         return ResponseEntity.ok(reservationService.getUserReservations(userId));
+    }
+    
+    @Override
+    @PutMapping("/{reservationId}")
+    public ResponseEntity<UserReservationDTO> updateReservation(
+            @PathVariable Long reservationId, 
+            @RequestBody UpdateReservationRequest request) {
+        try {
+            UserReservationDTO updated = reservationService.updateReservation(reservationId, request);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
     
     @Override

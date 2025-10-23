@@ -31,11 +31,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO register(UserDTO userDTO) {
+
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already registered");
+        }
+        
         User user = userMapper.toEntity(userDTO);
         user.setRole("EMPLOYEE");
-        user.setUserName(user.getUserName());  // hereee
+        user.setUserName(userDTO.getUserName());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user = userRepository.save(user);
         return userMapper.toDTO(user);
+    }
+
+    @Override
+    public UserDTO updateUser(Long userId, UserDTO userDTO) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        
+
+        if (userDTO.getFirstName() != null) {
+            existingUser.setFirstName(userDTO.getFirstName());
+        }
+        if (userDTO.getLastName() != null) {
+            existingUser.setLastName(userDTO.getLastName());
+        }
+        if (userDTO.getEmail() != null) {
+            existingUser.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getPhone() != null) {
+            existingUser.setPhone(userDTO.getPhone());
+        }
+        if (userDTO.getHomeAddress() != null) {
+            existingUser.setHomeAddress(userDTO.getHomeAddress());
+        }
+        
+        User updatedUser = userRepository.save(existingUser);
+        return userMapper.toDTO(updatedUser);
     }
 }

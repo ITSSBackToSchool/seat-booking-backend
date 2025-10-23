@@ -16,7 +16,7 @@ public class SeatAvailabilityDTO {
     private String floorName;
     private String buildingName;
     private Boolean isAvailable;
-    private String reservedBy;      // User who reserved it (if not available)
-    private String reservedTime;    // Time range "09:00 - 11:00"
+    private String reservedBy;
+    private String reservedTime;
 }
 

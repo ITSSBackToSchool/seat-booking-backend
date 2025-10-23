@@ -29,4 +29,4 @@ public class WeatherController {
     }
 }
 
-//http://localhost:8080/api/weather?city=Bucharest&date=2025-10-03
+

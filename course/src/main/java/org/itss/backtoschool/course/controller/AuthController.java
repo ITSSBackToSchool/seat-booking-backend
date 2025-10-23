@@ -33,6 +33,8 @@ public class AuthController {
                 "id", userOpt.get().getId(),
                 "token", token,
                 "userName", userOpt.get().getUserName(),
+                "firstName", userOpt.get().getFirstName() != null ? userOpt.get().getFirstName() : "",
+                "lastName", userOpt.get().getLastName() != null ? userOpt.get().getLastName() : "",
                 "role", userOpt.get().getRole() != null ? userOpt.get().getRole() : "EMPLOYEE"
         ));
     }
@@ -45,6 +47,8 @@ public class AuthController {
                 "id", savedUser.getId(),
                 "token", token,
                 "userName", savedUser.getUserName(),
+                "firstName", savedUser.getFirstName() != null ? savedUser.getFirstName() : "",
+                "lastName", savedUser.getLastName() != null ? savedUser.getLastName() : "",
                 "role", savedUser.getRole() != null ? savedUser.getRole() : "EMPLOYEE"
         ));
     }

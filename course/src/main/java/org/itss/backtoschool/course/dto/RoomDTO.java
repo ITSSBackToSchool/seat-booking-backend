@@ -12,4 +12,7 @@ public class RoomDTO {
     private String name;
     private Long floorId;
     private String floorName;
+    private String roomType;
+    private Integer seatCount;
+    private Boolean isAvailable;
 }

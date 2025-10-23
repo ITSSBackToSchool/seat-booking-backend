@@ -14,6 +14,9 @@ public interface RoomMapper {
     @Mapping(source = "name", target = "name")
     @Mapping(source = "floor.id", target = "floorId")
     @Mapping(source = "floor.name", target = "floorName")
+    @Mapping(source = "seatCount", target = "seatCount")
+    @Mapping(target = "roomType", expression = "java(room.getRoomType() != null ? room.getRoomType().name() : null)")
+    @Mapping(target = "isAvailable", ignore = true)
     RoomDTO toDTO(Room room);
 
     List<RoomDTO> toDTOList(List<Room> rooms);

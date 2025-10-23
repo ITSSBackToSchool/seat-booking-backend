@@ -30,4 +30,4 @@ public class TrafficController {
 
 
 
-//http://localhost:8080/api/traffic?origin=44.4268,26.1025&destination=44.4396,26.0963
+

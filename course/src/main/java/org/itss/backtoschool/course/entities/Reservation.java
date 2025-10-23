@@ -25,6 +25,7 @@ public class Reservation extends CommonEntity {
     @Column(nullable = false, name = "end_time")
     private LocalTime endTime;
 
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;

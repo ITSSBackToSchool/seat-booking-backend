@@ -6,6 +6,7 @@ import org.itss.backtoschool.course.dto.ReservationSeatDTO;
 import org.itss.backtoschool.course.dto.UserReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationSeatRequest;
+import org.itss.backtoschool.course.dto.request.UpdateReservationRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
 import org.itss.backtoschool.course.dto.response.CreateReservationSeatResponse;
 import org.itss.backtoschool.course.entities.*;
@@ -35,9 +36,9 @@ public class ReservationServiceImpl implements ReservationService {
   private final ReservationSeatMapper reservationSeatMapper;
   private final ReservationRoomMapper reservationRoomMapper;
 
-  // ==============================================================
-  // 🔹 SEAT RESERVATION
-  // ==============================================================
+
+
+
 
   @Override
   @Transactional
@@ -92,9 +93,9 @@ public class ReservationServiceImpl implements ReservationService {
     return saved;
   }
 
-  // ==============================================================
-  // 🔹 ROOM RESERVATION
-  // ==============================================================
+
+
+
 
   @Override
   @Transactional
@@ -144,9 +145,9 @@ public class ReservationServiceImpl implements ReservationService {
       .build();
   }
 
-  // ==============================================================
-  // 🔹 DASHBOARD / FETCH
-  // ==============================================================
+
+
+
 
   @Override
   @Transactional(readOnly = true)
@@ -185,9 +186,44 @@ public class ReservationServiceImpl implements ReservationService {
       .toList();
   }
 
-  // ==============================================================
-  // 🔹 CANCEL & UTILS
-  // ==============================================================
+
+
+
+
+  @Override
+  @Transactional
+  public UserReservationDTO updateReservation(Long reservationId, UpdateReservationRequest request) {
+    Reservation reservation = reservationRepository.findById(reservationId)
+      .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+
+
+    if (request.getReservationDate() != null) {
+      reservation.setReservationDate(request.getReservationDate());
+    }
+    if (request.getStartTime() != null) {
+      reservation.setStartTime(normalizeTime(request.getStartTime(), LocalTime.of(9, 0)));
+    }
+    if (request.getEndTime() != null) {
+      reservation.setEndTime(normalizeTime(request.getEndTime(), LocalTime.of(17, 0)));
+    }
+
+    reservationRepository.save(reservation);
+
+    System.out.printf("✏️ Reservation updated (id=%d)%n", reservationId);
+
+
+    return UserReservationDTO.builder()
+      .id(reservation.getId())
+      .seatNumber(reservation.getSeat() != null ? reservation.getSeat().getSeatNumber() : null)
+      .roomName(reservation.getRoom() != null ? reservation.getRoom().getName() : null)
+      .floorName(reservation.getRoom() != null ? reservation.getRoom().getFloor().getName() : null)
+      .buildingName(reservation.getRoom() != null ? reservation.getRoom().getFloor().getBuilding().getName() : null)
+      .reservationDate(reservation.getReservationDate())
+      .startTime(reservation.getStartTime())
+      .endTime(reservation.getEndTime())
+      .status(reservation.getStatus().name())
+      .build();
+  }
 
   @Override
   @Transactional

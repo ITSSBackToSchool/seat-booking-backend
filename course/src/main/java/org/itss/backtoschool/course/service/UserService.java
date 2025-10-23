@@ -8,4 +8,5 @@ public interface UserService {
     Optional<UserDTO> findByEmail(String email);
     Optional<UserDTO> findByUserName(String userName);
     UserDTO register(UserDTO userDTO);
+    UserDTO updateUser(Long userId, UserDTO userDTO);
 }

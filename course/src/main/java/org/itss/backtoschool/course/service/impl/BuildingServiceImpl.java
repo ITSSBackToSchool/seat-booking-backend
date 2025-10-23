@@ -37,7 +37,7 @@ public class BuildingServiceImpl implements BuildingService {
     
     @Override
     public List<FloorDTO> getFloorsByBuildingId(Long buildingId) {
-        // Verify building exists
+
         buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new RuntimeException("Building not found with id: " + buildingId));
         

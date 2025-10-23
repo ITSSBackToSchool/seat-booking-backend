@@ -5,6 +5,7 @@ import org.itss.backtoschool.course.dto.ReservationRoomDTO;
 import org.itss.backtoschool.course.dto.UserReservationDTO;
 import org.itss.backtoschool.course.dto.request.CreateReservationSeatRequest;
 import org.itss.backtoschool.course.dto.request.CreateReservationRoomRequest;
+import org.itss.backtoschool.course.dto.request.UpdateReservationRequest;
 import org.itss.backtoschool.course.dto.response.CreateReservationSeatResponse;
 import org.itss.backtoschool.course.dto.response.CreateReservationRoomResponse;
 
@@ -21,6 +22,8 @@ public interface ReservationService {
     List<ReservationRoomDTO> getAllRoomReservations();
     
     List<UserReservationDTO> getUserReservations(Long userId);
+    
+    UserReservationDTO updateReservation(Long reservationId, UpdateReservationRequest request);
     
     void cancelReservation(Long reservationId);
 }

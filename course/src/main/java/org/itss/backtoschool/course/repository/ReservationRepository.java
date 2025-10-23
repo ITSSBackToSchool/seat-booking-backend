@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-  // 🔹 Verifică dacă un SEAT este deja rezervat exact în acel moment
+
   boolean existsBySeat_IdAndReservationDateAndStartTimeAndStatus(
     Long seatId,
     LocalDate reservationDate,
@@ -22,7 +22,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     ReservationStatus status
   );
 
-  // 🔹 Verifică dacă o cameră este rezervată exact la acea oră
+
   @Query("""
            SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END
            FROM Reservation r
@@ -37,7 +37,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Param("startTime") LocalTime startTime
   );
 
-  // 🔹 Verifică dacă o cameră are rezervări care se suprapun în intervalul dat
+
   @Query("""
            SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END
            FROM Reservation r
@@ -53,7 +53,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Param("endTime") LocalTime endTime
   );
 
-  // 🔹 Pentru scaune — rezervări suprapuse (folosit la validare)
+
   @Query("""
            SELECT r FROM Reservation r
            WHERE r.seat.id = :seatId
@@ -68,13 +68,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Param("endTime") LocalTime endTime
   );
 
-  // 🔹 Toate rezervările unui utilizator (pentru Dashboard)
-  List<Reservation> findByUsersIdOrderByReservationDateDesc(Long userId);
 
-  // 🔹 Toate rezervările unui seat într-o anumită zi
-  List<Reservation> findBySeatIdAndReservationDate(Long seatId, LocalDate reservationDate);
+  @Query("SELECT r FROM Reservation r WHERE r.users.id = :userId ORDER BY r.reservationDate DESC")
+  List<Reservation> findByUsersIdOrderByReservationDateDesc(@Param("userId") Long userId);
 
-  // 🔹 Toate rezervările de camere cu detalii JOIN (room + floor + building + user)
+
+  @Query("SELECT r FROM Reservation r WHERE r.seat.id = :seatId AND r.reservationDate = :reservationDate")
+  List<Reservation> findBySeatIdAndReservationDate(@Param("seatId") Long seatId, @Param("reservationDate") LocalDate reservationDate);
+
+
   @Query("""
            SELECT r FROM Reservation r
            LEFT JOIN FETCH r.room room

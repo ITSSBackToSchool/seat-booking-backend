@@ -23,7 +23,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(userName)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 day
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -33,9 +33,9 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<io.jsonwebtoken.Claims, T> claimsResolver) {
-        final io.jsonwebtoken.Claims claims = Jwts.parserBuilder()   // use parserBuilder()
+        final io.jsonwebtoken.Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
-                .build()                                              // build() exists here
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
         return claimsResolver.apply(claims);
@@ -47,7 +47,7 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        Date expiration = Jwts.parserBuilder()                           // parserBuilder() here too
+        Date expiration = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)

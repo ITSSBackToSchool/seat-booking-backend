@@ -15,8 +15,14 @@ import java.util.List;
 @SuperBuilder
 public class User extends CommonEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String userName;
+
+    @Column
+    private String firstName;
+
+    @Column
+    private String lastName;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -30,7 +36,7 @@ public class User extends CommonEntity {
     @Column
     private String role;
 
-    @Column(name = "home_adress")
+    @Column(name = "home_address")
     private String homeAddress;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

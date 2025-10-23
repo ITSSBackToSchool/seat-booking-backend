@@ -37,11 +37,11 @@ public class FloorServiceImpl implements FloorService {
     
     @Override
     public List<RoomDTO> getRoomsByFloorId(Long floorId) {
-        // Verify floor exists
+
         floorRepository.findById(floorId)
                 .orElseThrow(() -> new RuntimeException("Floor not found with id: " + floorId));
         
-        var rooms = roomRepository.findByfloorId(floorId);
+        var rooms = roomRepository.findByFloorId(floorId);
         return roomMapper.toDTOList(rooms);
     }
     

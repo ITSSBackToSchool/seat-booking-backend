@@ -31,6 +31,7 @@ public class WeatherResponse {
         private double surface_pressure;
         private double wind_speed_10m;
         private double wind_direction_10m;
+        private int weather_code;
     }
 
     @Getter
@@ -42,5 +43,6 @@ public class WeatherResponse {
         private List<Double> precipitation_sum;
         private List<Double> wind_speed_10m_max;
         private List<Double> wind_direction_10m_dominant;
+        private List<Integer> weather_code;
     }
 }

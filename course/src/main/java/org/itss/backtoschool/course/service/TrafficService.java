@@ -4,20 +4,50 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.itss.backtoschool.course.dto.response.TrafficResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
 public class TrafficService {
 
-    private static final String API_KEY = "";
+    @Value("${google.maps.api-key}")
+    private String apiKey;
 
     public TrafficResponse getTrafficInfo(String origin, String destination) throws Exception {
-        String url = String.format(
-                "https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&departure_time=now&traffic_model=best_guess&key=%s",
-                origin, destination, API_KEY
-        );
+        return getTrafficInfo(origin, destination, null);
+    }
+
+    public TrafficResponse getTrafficInfo(String origin, String destination, LocalDateTime departureTime) throws Exception {
+        if (apiKey == null || apiKey.isEmpty() || apiKey.equals("YOUR_GOOGLE_MAPS_API_KEY_HERE")) {
+            throw new RuntimeException("Google Maps API key is not configured. Please add your API key to application.yml");
+        }
+
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromHttpUrl("https://maps.googleapis.com/maps/api/directions/json")
+                .queryParam("origin", origin)
+                .queryParam("destination", destination)
+                .queryParam("traffic_model", "best_guess")
+                .queryParam("key", apiKey);
+
+        if (departureTime != null) {
+            long unixTimestamp = departureTime.toEpochSecond(ZoneOffset.UTC);
+            System.out.println("Departure time: " + departureTime);
+            System.out.println("Unix timestamp in seconds: " + unixTimestamp);
+            builder.queryParam("departure_time", unixTimestamp);
+        } else {
+            builder.queryParam("departure_time", "now");
+        }
+
+        String url = builder.toUriString();
+        System.out.println("Full URL: " + url);
 
         RestTemplate restTemplate = new RestTemplate();
         String responseBody = restTemplate.getForObject(url, String.class);
@@ -25,13 +55,17 @@ public class TrafficService {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(responseBody);
 
-        if (!root.path("status").asText().equals("OK")) {
-            throw new RuntimeException("Eroare Google API: " + root.path("status").asText() +
-                    " | Mesaj: " + root.path("error_message").asText(""));
+        String apiStatus = root.path("status").asText();
+        System.out.println("Google API Status: " + apiStatus);
+        
+        if (!apiStatus.equals("OK")) {
+            String errorMsg = root.path("error_message").asText("");
+            System.out.println("Google API Error: " + errorMsg);
+            throw new RuntimeException("Error Google API: " + apiStatus +
+                    " | Message: " + errorMsg);
         }
 
         JsonNode leg = root.path("routes").get(0).path("legs").get(0);
-
 
         double distanceKm = leg.path("distance").path("value").asDouble() / 1000.0;
         double normalDurationMin = leg.path("duration").path("value").asDouble() / 60.0;
@@ -53,7 +87,6 @@ public class TrafficService {
         } else {
             trafficLevel = "HEAVY";
         }
-
 
         return TrafficResponse.builder()
                 .start(startAddress)

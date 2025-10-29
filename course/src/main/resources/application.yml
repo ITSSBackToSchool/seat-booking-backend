@@ -22,3 +22,10 @@ spring:
 
 server:
   port: 8080
+
+google:
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY:}
+jwt:
+  secret: ${JWT_SECRET:supersecretkeysupersecretkeysupersecretkey123456789012345678901234567890}
+  expiration: 86400000
